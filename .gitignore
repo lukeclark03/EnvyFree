@@ -1,0 +1,4 @@
+#ignore all out and precompiled header files
+*.out
+*.pch
+*.json
