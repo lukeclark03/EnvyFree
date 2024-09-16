@@ -77,15 +77,20 @@ void Classroom::printClassroom(){
         cout << "\n";
     }
     cout << "------------------------------------------------\n";
-    
-    
+}
+
+void Classroom::printStudents(){
+    cout << "Printing List of Students: \n";
+    for (int i = 0; i < students.size(); i++){
+        students[i].printStudent();        
+    }
 }
 
 
 
 
 int main(){
-    int test_num = 1;
+    int test_num = 2;
 
     if (test_num == 0){
         //Doing test of classroom printing functionality
@@ -103,11 +108,16 @@ int main(){
 
         Classroom room(num_seats, num_rows, fullness);
         room.students[1].printStudent();
-
-
-
-    }
     
+    }else if (test_num ==2){
+        //Doing test of student list printing functionality
+        int num_seats = 40;
+        int num_rows = 2;
+        int fullness = 10;
+
+        Classroom room(num_seats, num_rows, fullness);
+        room.printStudents();
+    }    
     
     else{
 

@@ -14,17 +14,17 @@ struct Student {
     void printStudent(){
         std::cout<< "Student " << ID << " ";
         if (sitting){
-            std::cout << "has   been  sat ";
+            std::cout << "has   been  sat, ";
         } else {
-            std::cout << "hasn't been sat ";
+            std::cout << "hasn't been sat, ";
         }
         if (greedy){
-            std::cout << "is  greedy  ";
+            std::cout << "is  greedy,  ";
         } else {
-            std::cout << "is ungreedy ";
+            std::cout << "is ungreedy, ";
         }
         if (preferred_row == -1){
-            std::cout << "and prefers no row";
+            std::cout << "and prefers no row\n";
         } else {
             std::cout << "and prefers row: " << preferred_row << "\n";
         }
@@ -43,6 +43,7 @@ struct Classroom {
 
     Classroom(int seat_num, int row_count, int fullness) ;
     void printClassroom();
+    void printStudents();
 
 };
 
