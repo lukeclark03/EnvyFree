@@ -68,6 +68,21 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_){
     
 }
 
+void Classroom::sitAllStudents(bool debug){
+    // this function seats all the students in the classroom, one at a time, with or without debugging
+    if (debug){
+        printClassroom();
+        printStudents();
+    }
+    for(int i = 0; i < fullness; i ++){
+        sitStudent();
+        if (debug){
+            printClassroom();
+            printStudents();
+        }
+    }
+}
+
 void Classroom::sitStudent(){
     // This function seats a single student, the next in the list
     if (number_sat >= fullness){
@@ -179,7 +194,7 @@ void Classroom::printStudents(){
 
 
 int main(){
-    int test_num = 4;
+    int test_num = 5;
 
     if (test_num == 0){
         //Doing test of classroom printing functionality
@@ -215,7 +230,7 @@ int main(){
         Classroom room(num_seats, num_rows, fullness);
         room.printDistances();
     } else if (test_num ==4){
-        //Doing test of student sitting functionality
+        //Doing test of sitStudent functionality
         int num_seats = 10;
         int num_rows = 1;
         int fullness = 3;
@@ -229,6 +244,15 @@ int main(){
         room.printClassroom();
         room.printStudents();
         
+    }  else if (test_num ==5){
+        //Doing test of sitAllStudents functionality
+        int num_seats = 10;
+        int num_rows = 1;
+        int fullness = 6;
+
+        Classroom room(num_seats, num_rows, fullness);
+        // room.printStudents();
+        room.sitAllStudents(true);
     }
     else{
 

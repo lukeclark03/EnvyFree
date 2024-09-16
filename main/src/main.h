@@ -46,6 +46,7 @@ struct Classroom {
     void printClassroom();
     void printStudents();
     void sitStudent();
+    void sitAllStudents(bool debug);
     void reCalcDistances(int row_num);
     void printDistances();
 };
