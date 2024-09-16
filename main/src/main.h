@@ -14,10 +14,25 @@ struct Classroom {
 
     int seat_num;
     int row_count;
+    int col_count;
     int fullness;
     std::vector<std::vector<int>> rows;
     std::vector<Student> students;
 
-    Classroom(int seat_num, int row_count, int fullness) : seat_num(seat_num), row_count(row_count), fullness(fullness) {};
+    Classroom(int seat_num, int row_count, int fullness) ;
+    void printClassroom();
+
+};
+
+class Game{
+private:
+    Classroom room;
+    std::vector<Student> students;
+    int num_sat;
+public:
+    void display();
+    void sitOne();
+    void sitAll();
+    Game(Classroom room, Student);
 
 };
