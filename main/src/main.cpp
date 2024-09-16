@@ -93,7 +93,6 @@ void Classroom::sitStudent(){
     }
     Student toSit = students[number_sat];
     if (toSit.greedy){
-        // TODO: implement greedy functionality here
         if (toSit.preferred_row == -1){
             // find the best row to sit in
             int best_row = -1;
@@ -102,6 +101,7 @@ void Classroom::sitStudent(){
                 auto best_seat_i = max_element(closest_student_dist[i].begin(), closest_student_dist[i].end());
                 if (*best_seat_i > best_dist){
                     best_row = i;
+                    best_dist = *best_seat_i;
                 }
             }
             // we now have the best row stored in best_row. Now we find the best seat in row best_row
@@ -246,8 +246,8 @@ int main(){
         
     }  else if (test_num ==5){
         //Doing test of sitAllStudents functionality
-        int num_seats = 10;
-        int num_rows = 1;
+        int num_seats = 20;
+        int num_rows = 2;
         int fullness = 6;
 
         Classroom room(num_seats, num_rows, fullness);
