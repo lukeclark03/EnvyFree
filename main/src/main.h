@@ -39,12 +39,15 @@ struct Classroom {
     int fullness;
     int number_sat;
     std::vector<std::vector<int>> rows;
+    std::vector<std::vector<int>> closest_student_dist;
     std::vector<Student> students;
 
     Classroom(int seat_num, int row_count, int fullness) ;
     void printClassroom();
     void printStudents();
-
+    void sitStudent();
+    void reCalcDistances(int row_num);
+    void printDistances();
 };
 
 class Game{

@@ -46,7 +46,17 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_){
         }
         rows.push_back(temp_row);
     }
-    //TODO: include the seating functionality
+
+    // initialize the grid of nearest distances in the classroom 
+    for (int i = 0; i < row_count; i++){
+        temp_row.clear();
+        for (int j = 0; j < col_count; j++){
+            temp_row.push_back(min(j+1,col_count-j));
+        }
+        closest_student_dist.push_back(temp_row);
+    }
+
+
     // All students are greedy at the moment
     for (int i = 0; i < fullness; i++){
         // Adding students to the vector of students
@@ -55,6 +65,46 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_){
     }
 
     
+}
+
+    //TODO: include the seating functionality
+void Classroom::sitStudent(){
+    // This function seats a single student, the next in the list
+    if (number_sat >= fullness){
+        throw invalid_argument("Cannot sit another student, everyone has been sat");
+    }
+    if (students[number_sat].sitting){
+        throw invalid_argument("Cannot sit a student that is already seated");
+    }
+    Student toSit = students[number_sat];
+    if (toSit.greedy){
+        // TODO: implement greedy functionality here
+
+    } else {
+        // TODO: implement ungreedy functionality here
+        throw invalid_argument("Ungreedy seating functionality has not yet been created");
+    }
+
+
+    number_sat++;
+}
+
+void Classroom::reCalcDistances(int row_num){
+
+}
+
+void Classroom::printDistances(){
+    for (int i = 0; i < closest_student_dist.size(); i++){
+        for (int j = 0; j < closest_student_dist[i].size(); j++){
+            if (closest_student_dist[i][j] < 10){
+                cout << "0" << closest_student_dist[i][j];
+            } else {
+                cout << closest_student_dist[i][j];
+            }
+            cout << "  ";
+        }
+        cout << "\n";
+    }
 }
 
 void Classroom::printClassroom(){
@@ -90,7 +140,7 @@ void Classroom::printStudents(){
 
 
 int main(){
-    int test_num = 2;
+    int test_num = 3;
 
     if (test_num == 0){
         //Doing test of classroom printing functionality
@@ -117,8 +167,15 @@ int main(){
 
         Classroom room(num_seats, num_rows, fullness);
         room.printStudents();
-    }    
-    
+    }else if (test_num ==3){
+        //Doing test of student distance printing functionality
+        int num_seats = 10;
+        int num_rows = 1;
+        int fullness = 3;
+
+        Classroom room(num_seats, num_rows, fullness);
+        room.printDistances();
+    }
     else{
 
         
