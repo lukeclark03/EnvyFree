@@ -1,13 +1,34 @@
 #include<vector>
-
+#include <iostream>
 struct Student {
-
+    // true for greedy, false for not
     bool greedy;
+    // -1 for no preference, 0-row count-1 for a specific preference 
     int preferred_row;
+    // 0-fullness-1
     int ID;
+    // boolean for sitting or standing
+    bool sitting;
 
-    Student(int greedy, int preferred_row, int ID) : greedy(greedy), preferred_row(preferred_row), ID(ID) {};
-
+    Student(int greedy, int preferred_row, int ID, bool sitting) : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting) {};
+    void printStudent(){
+        std::cout<< "Student " << ID << " ";
+        if (sitting){
+            std::cout << "has   been  sat ";
+        } else {
+            std::cout << "hasn't been sat ";
+        }
+        if (greedy){
+            std::cout << "is  greedy  ";
+        } else {
+            std::cout << "is ungreedy ";
+        }
+        if (preferred_row == -1){
+            std::cout << "and prefers no row";
+        } else {
+            std::cout << "and prefers row: " << preferred_row << "\n";
+        }
+    }
 };
 
 struct Classroom {
@@ -16,6 +37,7 @@ struct Classroom {
     int row_count;
     int col_count;
     int fullness;
+    int number_sat;
     std::vector<std::vector<int>> rows;
     std::vector<Student> students;
 

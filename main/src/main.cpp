@@ -31,9 +31,12 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_){
     this->row_count = row_count_;
     this->fullness = fullness_;
     if (seat_num % row_count != 0){
-        throw invalid_argument("Seat count must be a multiple of row count");
+        throw invalid_argument("Seat count must be a multiple of row count.");
+    } else if (fullness > seat_num){
+        throw invalid_argument("Must have fewer students than seats.");
     }
     col_count = seat_num/row_count;
+    number_sat = 0;
     // initialize the grid of students in the classroom (-1 is empty, 0-N are used by student with that number)
     vector<int> temp_row;
     for (int i = 0; i < row_count; i++){
@@ -43,7 +46,15 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_){
         }
         rows.push_back(temp_row);
     }
-    //TODO: include the initialization of students for the classroom, and the seating functionality
+    //TODO: include the seating functionality
+    // All students are greedy at the moment
+    for (int i = 0; i < fullness; i++){
+        // Adding students to the vector of students
+        // at this point, all students are greedy (true) and none of them have a preferred row (-1)
+        students.push_back(Student(true, -1, i, false));
+    }
+
+    
 }
 
 void Classroom::printClassroom(){
@@ -74,18 +85,31 @@ void Classroom::printClassroom(){
 
 
 int main(){
-    int test_num = 0;
-    cout << "game theory" << std::endl;
+    int test_num = 1;
 
     if (test_num == 0){
         //Doing test of classroom printing functionality
         int num_seats = 40;
         int num_rows = 2;
-        int fullness = 50;
+        int fullness = 3;
 
         Classroom room(num_seats, num_rows, fullness);
         room.printClassroom();
-    }else {
+    }else if (test_num ==1){
+        //Doing test of single student printing functionality
+        int num_seats = 40;
+        int num_rows = 2;
+        int fullness = 3;
+
+        Classroom room(num_seats, num_rows, fullness);
+        room.students[1].printStudent();
+
+
+
+    }
+    
+    
+    else{
 
         
 
