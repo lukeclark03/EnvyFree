@@ -62,7 +62,7 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_){
     for (int i = 0; i < fullness; i++){
         // Adding students to the vector of students
         // at this point, all students are greedy (true) and none of them have a preferred row (-1)
-        students.push_back(Student(true, -1, i, false));
+        students.push_back(Student(true, -1, i, false, -1));
     }
 
     
@@ -108,8 +108,10 @@ void Classroom::sitStudent(){
             auto best_seat = max_element(closest_student_dist[best_row].begin(), closest_student_dist[best_row].end());
             int best_seat_index = distance(closest_student_dist[best_row].begin(), best_seat);
             rows[best_row][best_seat_index] = toSit.ID;
+            cout << "Sat student " << toSit.ID << " at seat " << best_seat_index << " for prospective payoff: " << closest_student_dist[best_row][best_seat_index] -1<<  endl << endl;
             students[number_sat].sitting = true;
             reCalcDistances(best_row);
+            reCalcPayoffs(best_row);
         }else {
             // TODO: implement preferred row functionality here
             throw invalid_argument("preffered row functionality has not yet been created");
@@ -128,18 +130,54 @@ void Classroom::sitStudent(){
 void Classroom::reCalcDistances(int row_num){
     // we will be working with rows[row_num] and closest_student_dist[row_num]
     for (int i = 0; i < col_count; i++){
+        // cout << "updating seat: " << i << endl;
         if (rows[row_num][i] != -1){
             // This seat is occupied, so it has a distance of 0
             closest_student_dist[row_num][i] = 0;
         } else {
             // we have an open seat (dist >=1)
-            closest_student_dist[row_num][i] = 1;
+            closest_student_dist[row_num][i] = 2;
             // now we increment it until we reach an impediment (student or end of row) on either side
-            int dist = 1;
-            while (i+ dist < col_count && i - dist > 0 && rows[row_num][i - dist] == -1 && rows[row_num][i+ dist] == -1){
-                closest_student_dist[row_num][i] ++;
-                dist++; 
+            int l_dist = 1;
+            int r_dist =1;
+            while (i-l_dist >= 0 && rows[row_num][i - l_dist] == -1){
+                // cout << "decrementing left" << endl;
+                closest_student_dist[row_num][i]++;
+                l_dist++;
             }
+            
+            while (i+r_dist < col_count && rows[row_num][i + r_dist] == -1){
+                // cout << "incrementing right" << endl;
+                closest_student_dist[row_num][i]++;
+                r_dist++;
+            }
+        }
+    }
+}
+
+void Classroom::reCalcPayoffs(int row_num){
+    // we will be working with rows[row_num] and closest_student_dist[row_num]
+    // cout << "recalculating payoffs" << endl;
+    for (int i = 0; i < col_count; i++){
+
+        if (rows[row_num][i]!= -1){
+            // we have a student at this space
+            // cout << "student detected at space " << i << endl;
+            int temp_payoff;
+            if (closest_student_dist[row_num][i] == 0){
+                temp_payoff = 1;
+            }
+            if (i -1 >= 0 && closest_student_dist[row_num][i-1] > 0){
+                temp_payoff = closest_student_dist[row_num][i-1];
+            }
+            if (i+1 < col_count &&closest_student_dist[row_num][i+1] > 0){
+                temp_payoff = closest_student_dist[row_num][i+1];
+            }
+            // cout << "setting payout to " << temp_payoff << endl;
+            students[rows[row_num][i]].payoff = temp_payoff;
+
+        } else {
+            // cout << "no student detected at space " << i << endl;
         }
     }
 }
@@ -178,9 +216,9 @@ void Classroom::printClassroom(){
         }
         cout << "\n";
     }
-    printDistances();
+    // printDistances();
     cout << "\n";
-    cout << "------------------------------------------------\n";
+    cout << "------------------------------------------------\n\n";
 }
 
 void Classroom::printStudents(){
@@ -188,6 +226,7 @@ void Classroom::printStudents(){
     for (int i = 0; i < students.size(); i++){
         students[i].printStudent();        
     }
+    cout << endl;
 }
 
 
@@ -246,9 +285,9 @@ int main(){
         
     }  else if (test_num ==5){
         //Doing test of sitAllStudents functionality
-        int num_seats = 20;
-        int num_rows = 2;
-        int fullness = 6;
+        int num_seats = 10;
+        int num_rows = 1;
+        int fullness = 7;
 
         Classroom room(num_seats, num_rows, fullness);
         // room.printStudents();

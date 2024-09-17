@@ -9,8 +9,9 @@ struct Student {
     int ID;
     // boolean for sitting or standing
     bool sitting;
-
-    Student(int greedy, int preferred_row, int ID, bool sitting) : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting) {};
+    // integer for the payoff amount
+    int payoff;
+    Student(int greedy, int preferred_row, int ID, bool sitting, int payoff) : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff) {};
     void printStudent(){
         std::cout<< "Student " << ID << " ";
         if (sitting){
@@ -18,15 +19,15 @@ struct Student {
         } else {
             std::cout << "hasn't been sat, ";
         }
-        if (greedy){
-            std::cout << "is  greedy,  ";
+        // if (greedy){
+        //     std::cout << "is  greedy,  ";
+        // } else {
+        //     std::cout << "is ungreedy, ";
+        // }
+        if (payoff == -1){
+            std::cout << "and has no payout\n";
         } else {
-            std::cout << "is ungreedy, ";
-        }
-        if (preferred_row == -1){
-            std::cout << "and prefers no row\n";
-        } else {
-            std::cout << "and prefers row: " << preferred_row << "\n";
+            std::cout << "and has payout: " << payoff << "\n";
         }
     }
 };
@@ -41,6 +42,7 @@ struct Classroom {
     std::vector<std::vector<int>> rows;
     std::vector<std::vector<int>> closest_student_dist;
     std::vector<Student> students;
+    // std::vector<int> payoffs;
 
     Classroom(int seat_num, int row_count, int fullness) ;
     void printClassroom();
@@ -48,6 +50,7 @@ struct Classroom {
     void sitStudent();
     void sitAllStudents(bool debug);
     void reCalcDistances(int row_num);
+    void reCalcPayoffs(int row_num);
     void printDistances();
 };
 
