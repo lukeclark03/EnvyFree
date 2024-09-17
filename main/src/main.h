@@ -13,7 +13,9 @@ struct Student {
     int payoff;
     Student(int greedy, int preferred_row, int ID, bool sitting, int payoff) : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff) {};
     void printStudent(){
-        std::cout<< "Student " << ID << " ";
+        std::cout<< "Student ";
+        if (ID < 10){std::cout << "0";}
+        std::cout << ID << " ";
         if (sitting){
             std::cout << "has   been  sat, ";
         } else {
@@ -39,12 +41,13 @@ struct Classroom {
     int col_count;
     int fullness;
     int number_sat;
+    bool naive;
     std::vector<std::vector<int>> rows;
     std::vector<std::vector<int>> closest_student_dist;
     std::vector<Student> students;
     // std::vector<int> payoffs;
 
-    Classroom(int seat_num, int row_count, int fullness) ;
+    Classroom(int seat_num, int row_count, int fullness, bool naive_) ;
     void printClassroom();
     void printStudents();
     void sitStudent();
