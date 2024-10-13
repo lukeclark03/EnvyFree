@@ -280,9 +280,6 @@ void Classroom::printStudents(){
     cout << endl;
 }
 
-
-
-
 int main(){
     int test_num = 6;
 

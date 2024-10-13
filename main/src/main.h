@@ -1,4 +1,4 @@
-#include<vector>
+#include <vector>
 #include <iostream>
 struct Student {
     // true for greedy, false for not
@@ -27,7 +27,7 @@ struct Student {
         //     std::cout << "is ungreedy, ";
         // }
         if (payoff == -1){
-            std::cout << "and has no payout\n";
+            std::cout << "and has no payoff\n";
         } else {
             std::cout << "and has payout: " << payoff << "\n";
         }
