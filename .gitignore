@@ -3,3 +3,7 @@
 *.pch
 *.json
 .obsidian
+.clang-format
+.clang-tidy
+.editorconfig
+main/src/build/
