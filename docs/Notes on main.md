@@ -32,3 +32,10 @@
 ## Main: 
 - Running tests with numbers 0-6
 - Otherwise, run program
+
+## Function initStudents:
+- Should initialize a vector of students;
+	- *May initialize random personalities in the future?*
+
+## Function fillRows
+- *Should*
