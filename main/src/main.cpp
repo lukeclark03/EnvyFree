@@ -195,13 +195,13 @@ void Classroom::sitStudent(){
     " and payoff: " <<  min(closest_student_dist[seat.first][seat.second], toSit.max_utility) <<  endl << endl;
     students[number_sat].sitting = true;
 
-    reCalcDistances(seat.first);
-    reCalcPayoffs(seat.first);
+    reCalcDistances(seat.first, toSit);
+    reCalcPayoffs(seat.first, toSit);
 
     number_sat++;
 }
 
-void Classroom::reCalcDistances(int row_num){
+void Classroom::reCalcDistances(int row_num, Student& lastSeated){
     
     // Previous logic wasn't working well.
     /*
@@ -232,7 +232,6 @@ void Classroom::reCalcDistances(int row_num){
     }
     
     */
-    
     
     // Start at beginning of each row and scan until reaching a set of students (right now can only be 1)
 
@@ -297,7 +296,7 @@ void Classroom::reCalcDistances(int row_num){
 }
 
 
-void Classroom::reCalcPayoffs(int row_num){
+void Classroom::reCalcPayoffs(int row_num, Student& lastSeated){
     // we will be working with rows[row_num] and closest_student_dist[row_num]
     // cout << "recalculating payoffs" << endl;
     for (int i = 0; i < col_count; i++){

@@ -21,6 +21,7 @@ struct Student {
     // integer for the payoff amount
     int payoff;
     int max_utility;
+
     Student(int greedy, int preferred_row, int ID, bool sitting, int payoff, int max_utility)
         : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff), max_utility(max_utility) {};
     void printStudent(){
@@ -44,6 +45,53 @@ struct Student {
             std::cout << "and has preferred maximum utility: " << max_utility << "\n";
         }
     }
+
+    std::vector<int> withoutSelfDistances(std::vector<int>& current_row, std::vector<int>& current_row_distances) {
+        
+        std::vector<int> selfdist(current_row_distances);
+        // Add case where set where seat is more than 1 -> no change in vector
+        // return current_row;
+        auto found = find(current_row.begin(),current_row.end(), this->ID);
+
+        auto before = current_row.begin();
+        for (auto it = current_row.begin(); it != found; it++) {
+            if (*it != -1)
+                before = it;
+        }
+
+        auto after = found;
+        for (auto it = found; it != current_row.end(); it++) {
+            if (*it != -1)
+                after = it;
+        }
+
+        int dist_before = distance(before, found);
+        int dist_after = distance(found, after);
+        int index = distance(current_row.begin(), found);
+
+        // Case 1: Surrounded 1 (1) 1
+        if (dist_before == 0 && dist_after == 0)
+            selfdist.at(index) = 1;
+        
+        // Case 2: One next, one N away
+            // two symmetrical conditions
+            // Need to add 1 to middle of N dist, from middle up to self
+        
+        // Case 3:
+            // One M away, one N away
+            // similar to above, but need to treat self as middle, incrementing from previous 2 middle values
+            // until now middle value
+
+        // Case 4:
+            // One of the edges is free
+            // Just keep adding past middle for other person
+
+        // Case 5:
+            /// Only one in row
+            // Just take each value to be row length
+
+    }
+
 };
 
 struct Classroom {
@@ -66,8 +114,8 @@ struct Classroom {
     void printStudents();
     void sitStudent();
     void sitAllStudents(bool debug);
-    void reCalcDistances(int row_num);
-    void reCalcPayoffs(int row_num);
+    void reCalcDistances(int row_num, Student& lastSeated);
+    void reCalcPayoffs(int row_num, Student& lastSeated);
     void printDistances();
 };
 
