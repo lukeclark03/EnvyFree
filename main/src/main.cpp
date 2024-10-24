@@ -1,15 +1,15 @@
-#include "main.h"
+#include "testing.h"
 #include <iostream>
 #include <vector>
 #include <algorithm>
 #include <random>
 #include <chrono>
+
 using namespace std;
 
 
 vector<Student> initStudents(int num_students, int num_greedy){
     vector<Student> students;
-    int greedy_added;
 
     for(int i = 0; i < num_students; i++){
         // For now, does nothing else to initialize students,
@@ -28,13 +28,12 @@ void fillrows(int num_students){
 }
 
 
-Classroom::Classroom(int seat_num_, int row_count_, int fullness_, bool naive_, int util_){
+Classroom::Classroom(int seat_num_, int row_count_, int fullness_,int util_){
 
     // Initialization of member variables
     this->seat_num = seat_num_;
     this->row_count = row_count_;
     this->fullness = fullness_;
-    this->naive = naive_;
     max_utility = util_;
 
     // Validity Checks
@@ -100,7 +99,7 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_, bool naive_, 
     for (int i = 0; i < fullness; i++){
         // Adding students to the vector of students
         // at this point, all students are greedy (true) and none of them have a preferred row (-1)
-        Student* new_student = new Student(naive, -1, i, false, -1, max_utility);  
+        Student* new_student = new Student(-1, i, false, -1, max_utility);  
         students.push_back(new_student);
     }
     printStudents();
@@ -502,7 +501,7 @@ void Classroom::reCalcPayoffs(int row_num){
             /* for (int j = 0; j < rows_mapped_by_payoff.size(); j++) {
                 set<coordinates>& current_row = rows_mapped_by_payoff[j];
                 auto found = current_row.find(coordinates(row_num,i));
-                if (found != current_row.end() && j != students[index]->payoff) {
+                if (found != current_row.end() && j != students[ibndex]->payoff) {
                     coordinates savedpair = *found;
                     current_row.erase(found);
                     rows_mapped_by_payoff[students[index]->payoff].emplace(savedpair);
@@ -768,16 +767,24 @@ void Classroom::printStudents(){
 }
 
 int main(){
-    int test_num = -1;
+    int test_num = 0;
+    bool test_list = true;
 
-    if (test_num == 0){
+    if (test_list) {
+
+    runTests({
+        {1,{40,2,3,3, 2}},
+    },
+    exampletestlist);
+
+    }else if (test_num == 0){
         //Doing test of classroom printing functionality
         int num_seats = 40;
         int num_rows = 2;
         int fullness = 3;
         int utility = 3;
 
-        Classroom room(num_seats, num_rows, fullness, true, utility);
+        Classroom room(num_seats, num_rows, fullness,  utility);
         room.printClassroom();
     }else if (test_num ==1){
         //Doing test of single student printing functionality
@@ -786,7 +793,7 @@ int main(){
         int fullness = 3;
         int utility = 3;
 
-        Classroom room(num_seats, num_rows, fullness, true, utility);
+        Classroom room(num_seats, num_rows, fullness, utility);
         room.students[1]->printStudent();
 
     }else if (test_num ==2){
@@ -796,7 +803,7 @@ int main(){
         int fullness = 10;
         int utility = 3;
 
-        Classroom room(num_seats, num_rows, fullness, true, utility);
+        Classroom room(num_seats, num_rows, fullness, utility);
         room.printStudents();
     }else if (test_num ==3){
         //Doing test of student distance printing functionality
@@ -805,7 +812,7 @@ int main(){
         int fullness = 3;
         int utility = 3;
 
-        Classroom room(num_seats, num_rows, fullness, true, utility);
+        Classroom room(num_seats, num_rows, fullness, utility);
         room.printDistances();
     } else if (test_num ==4){
         //Doing test of sitStudent functionality
@@ -814,7 +821,7 @@ int main(){
         int fullness = 3;
         int utility = 3;
 
-        Classroom room(num_seats, num_rows, fullness, true, utility);
+        Classroom room(num_seats, num_rows, fullness, utility);
         // room.printStudents();
         room.printClassroom();
         room.sitStudent();
@@ -830,7 +837,7 @@ int main(){
         int fullness = 3;
         int utility = 3;
 
-        Classroom room(num_seats, num_rows, fullness, true, utility);
+        Classroom room(num_seats, num_rows, fullness, utility);
         // room.printStudents();
         room.sitAllStudents(true);
         room.iteratedBestResponse();
@@ -864,6 +871,9 @@ int main(){
         // room.printClassroom();
         // room.printStudents();
 
+
+
+
     }
     else{
 
@@ -872,8 +882,7 @@ int main(){
         int input_seats;
         int input_rows;
         int input_maxutil;
-        int choice;
-        bool choice_bool;
+
 
         // Take in seats, students, rows
         cout << "Number of Seats: ";
@@ -883,22 +892,6 @@ int main(){
         cout << "Number of Rows: ";
         cin >>input_rows;
 
-
-        cout << "Creating Classroom with  " << input_seats << " seats and " << input_students << " students" << endl;
-        cout << "Choose strategy: \n1. Naive Greedy\n2. Greedy\n";
-
-        // Chose strategy (Is this still relevant right now?)
-        cin>>choice;
-        if (choice == 1){
-            choice_bool = true;
-            cout << "You chose 1.Naive Greedy" << endl;
-        } else if (choice == 2){
-            choice_bool = false;
-            cout << "You chose 2. Greedy" << endl;
-        } else {
-            throw invalid_argument("Must choose either 1 or 2.");
-        }
-
         // Take in a maximum utility
         cout << "Chose maximum utility for all students: ";
         cin >> input_maxutil;
@@ -906,7 +899,7 @@ int main(){
             throw invalid_argument("Must be a positive number");
 
         // Create classroom and seat students
-        Classroom room(input_seats, input_rows, input_students, choice_bool, input_maxutil);
+        Classroom room(input_seats, input_rows, input_students, input_maxutil);
         cout << "Created Classroom. Seating all students" << endl;
         room.sitAllStudents(true);
 
