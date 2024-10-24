@@ -3,6 +3,7 @@
 #include <vector>
 #include <algorithm>
 #include <random>
+#include <cstdlib>
 #include <iterator>
 using namespace std;
 
@@ -35,6 +36,7 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_, bool naive_, 
     this->row_count = row_count_;
     this->fullness = fullness_;
     this->naive = naive_;
+    max_utility = util_;
 
     // Validity Checks
     if (seat_num % row_count != 0){
@@ -58,36 +60,59 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_, bool naive_, 
         rows.push_back(temp_row);
     }
 
-    // initialize the grid of nearest distances in the classroom
-    // as well as payoff categorization
-    while(rows_mapped_by_payoff.size() < util_ + 1) {
-        rows_mapped_by_payoff.emplace_back();
-    }
-    
+    // initialize the grid of distances for the students
+    temp_row.clear();
     for (int i = 0; i < row_count; i++){
         temp_row.clear();
         for (int j = 0; j < col_count; j++){
-            temp_row.push_back(col_count);
-
-            // fill in payoffs as all at 0 payoff, so the first iteration is all random.
-            rows_mapped_by_payoff.back().emplace(coordinates(i,j));
+            temp_row.push_back(max_utility);
         }
         closest_student_dist.push_back(temp_row);
     }
+
+
+
+    // initialize the layout of the classroom with empty vectors
+    vector<Student*> temp_ptr_list;
+    vector<vector<Student*>> temp_ptr_row;
+    for (int i = 0; i < row_count; i++){
+        temp_ptr_row.clear();
+        for (int j = 0; j < col_count; j++){
+            temp_ptr_row.push_back(temp_ptr_list);
+        }
+        layout.push_back(temp_ptr_row);
+    }
+
+
+    
+    // for (int i = 0; i < row_count; i++){
+    //     temp_row.clear();
+    //     for (int j = 0; j < col_count; j++){
+    //         temp_row.push_back(col_count);
+
+    //         // fill in payoffs as all at 0 payoff, so the first iteration is all random.
+    //         rows_mapped_by_payoff.back().emplace(coordinates(i,j));
+    //     }
+    //     closest_student_dist.push_back(temp_row);
+    // }
 
     // Students are greedy/nongreedy depending on the class variable
     
     for (int i = 0; i < fullness; i++){
         // Adding students to the vector of students
         // at this point, all students are greedy (true) and none of them have a preferred row (-1)
-        students.push_back(Student(naive, -1, i, false, -1, util_));
+        Student* new_student = new Student(naive, -1, i, false, -1, max_utility);  
+        students.push_back(new_student);
     }
-
+    printStudents();
 
 }
 
 void Classroom::sitAllStudents(bool debug){
     // this function seats all the students in the classroom, one at a time, with or without debugging
+    // seed the random number generator
+    srand((unsigned) time(NULL));
+
     if (debug){
         printClassroom();
         printStudents();
@@ -109,177 +134,288 @@ void Classroom::sitStudent(){
     if (number_sat >= fullness){
         throw invalid_argument("Cannot sit another student, everyone has been sat");
     }
-    if (students[number_sat].sitting){
+    if (students[number_sat]->sitting){
         throw invalid_argument("Cannot sit a student that is already seated");
     }
 
-    Student toSit = students[number_sat];
-
-    // Previous implementation
-
-    /* if (toSit.greedy){
-        if (toSit.preferred_row == -1){
-            // find the best row to sit in
-            int best_row = -1;
-            int best_dist = 0;
-            for (int i = 0; i < row_count; i++){
-                auto best_seat_i = max_element(closest_student_dist[i].begin(), closest_student_dist[i].end());
-                if (*best_seat_i > best_dist){
-                    best_row = i;
-                    best_dist = *best_seat_i;
-                }
-            }
-            // we now have the best row stored in best_row. Now we find the best seat in row best_row
-            auto best_seat = max_element(closest_student_dist[best_row].begin(), closest_student_dist[best_row].end());
-            int best_seat_index = distance(closest_student_dist[best_row].begin(), best_seat);
-            rows[best_row][best_seat_index] = toSit.ID;
-            cout << "Sat student " << toSit.ID << " at seat " << best_seat_index << " for prospective payoff: " << closest_student_dist[best_row][best_seat_index] -1<<  endl << endl;
-            students[number_sat].sitting = true;
-            reCalcDistances(best_row);
-            reCalcPayoffs(best_row);
-        } else {
-            // TODO: implement preferred row functionality here
-            throw invalid_argument("preffered row functionality has not yet been created");
-        }
+    // get the current student who needs to sit
+    Student* toSit = students[number_sat];
+    cout << "sitting a student: " << toSit->ID << endl;
 
 
-    } else {
-        if (toSit.preferred_row == -1){
-            // find the best row to sit in
-            int best_row = -1;
-            int best_dist = 0;
-            for (int i = 0; i < row_count; i++){
-                auto best_seat_i = max_element(closest_student_dist[i].begin(), closest_student_dist[i].end());
-                if (*best_seat_i > best_dist){
-                    best_row = i;
-                    best_dist = *best_seat_i;
-                }
-            }
-            // we now have the best row stored in best_row. Now we find the best seat in row best_row
-            auto best_seat = max_element(closest_student_dist[best_row].begin(), closest_student_dist[best_row].end());
-            int best_seat_index = distance(closest_student_dist[best_row].begin(), best_seat);
-            // so now we know the first best seat index. We need to add an amount to it so that it is in the middle of the block. The block size is closest_student_dist[best_row][best_seat_index] - 1
-            // so we need to add half of the block size
-            best_seat_index += (closest_student_dist[best_row][best_seat_index] - 2)/2;
-            rows[best_row][best_seat_index] = toSit.ID;
-            cout << "Sat student " << toSit.ID << " at seat " << best_seat_index << " for prospective payoff: " << closest_student_dist[best_row][best_seat_index] -1<<  endl << endl;
-            students[number_sat].sitting = true;
-            reCalcDistances(best_row);
-            reCalcPayoffs(best_row);
-        }else {
-            // TODO: implement preferred row functionality here
-            throw invalid_argument("preffered row functionality has not yet been created");
-        }
+
+    // get a random row
+    int rand_row = rand() % row_count;
+    // get a random column
+    int rand_col = rand() % col_count;
+
+    cout << "sitting student randomly at row " << rand_row << "and col: " << rand_col << endl;
+    // add the student to that spot
+    toSit->printStudent();
+    layout[rand_row][rand_col].push_back(toSit);
+
+    // recalculate the distances and payoffs for the row the student sat in
+    reCalcDistances(rand_row);
+    cout << "finished reCalcDsitances" << endl;
+    // reCalcPayoffs(rand_row, toSit);
+
+    //increment the number of students that have been sat
+    number_sat++;
+    cout << "finished sitting students" << endl;
 
 
-        // TODO: implement ungreedy functionality here
-    }
-    */
+
+    // // Previous implementation
+
+    //  if (toSit.greedy){
+    //     if (toSit.preferred_row == -1){
+    //         // find the best row to sit in
+    //         int best_row = -1;
+    //         int best_dist = 0;
+    //         for (int i = 0; i < row_count; i++){
+    //             auto best_seat_i = max_element(closest_student_dist[i].begin(), closest_student_dist[i].end());
+    //             if (*best_seat_i > best_dist){
+    //                 best_row = i;
+    //                 best_dist = *best_seat_i;
+    //             }
+    //         }
+    //         // we now have the best row stored in best_row. Now we find the best seat in row best_row
+    //         auto best_seat = max_element(closest_student_dist[best_row].begin(), closest_student_dist[best_row].end());
+    //         int best_seat_index = distance(closest_student_dist[best_row].begin(), best_seat);
+    //         rows[best_row][best_seat_index] = toSit.ID;
+    //         cout << "Sat student " << toSit.ID << " at seat " << best_seat_index << " for prospective payoff: " << closest_student_dist[best_row][best_seat_index] -1<<  endl << endl;
+    //         students[number_sat].sitting = true;
+    //         reCalcDistances(best_row);
+    //         reCalcPayoffs(best_row);
+    //     } else {
+    //         // TODO: implement preferred row functionality here
+    //         throw invalid_argument("preffered row functionality has not yet been created");
+    //     }
+
+
+    // } else {
+    //     if (toSit.preferred_row == -1){
+    //         // find the best row to sit in
+    //         int best_row = -1;
+    //         int best_dist = 0;
+    //         for (int i = 0; i < row_count; i++){
+    //             auto best_seat_i = max_element(closest_student_dist[i].begin(), closest_student_dist[i].end());
+    //             if (*best_seat_i > best_dist){
+    //                 best_row = i;
+    //                 best_dist = *best_seat_i;
+    //             }
+    //         }
+    //         // we now have the best row stored in best_row. Now we find the best seat in row best_row
+    //         auto best_seat = max_element(closest_student_dist[best_row].begin(), closest_student_dist[best_row].end());
+    //         int best_seat_index = distance(closest_student_dist[best_row].begin(), best_seat);
+    //         // so now we know the first best seat index. We need to add an amount to it so that it is in the middle of the block. The block size is closest_student_dist[best_row][best_seat_index] - 1
+    //         // so we need to add half of the block size
+    //         best_seat_index += (closest_student_dist[best_row][best_seat_index] - 2)/2;
+    //         rows[best_row][best_seat_index] = toSit.ID;
+    //         cout << "Sat student " << toSit.ID << " at seat " << best_seat_index << " for prospective payoff: " << closest_student_dist[best_row][best_seat_index] -1<<  endl << endl;
+    //         students[number_sat].sitting = true;
+    //         reCalcDistances(best_row);
+    //         reCalcPayoffs(best_row);
+    //     }else {
+    //         // TODO: implement preferred row functionality here
+    //         throw invalid_argument("preffered row functionality has not yet been created");
+    //     }
+
+
+    //     // TODO: implement ungreedy functionality here
+    // }
+    
     
     // Find maximum possible payoff
     // Select a random one of the maxiumum payoff seats
     // Since payoffs are already capped at the max set by the user
     // There is no need to worry it will select a higher payoff than that on purpose.
-    std::random_device seed;
-    std::mt19937 randgen(seed());
-    std::uniform_int_distribution<uint32_t> randdist{0, static_cast<unsigned int>(rows_mapped_by_payoff.back().size())};
+    // std::random_device seed;
+    // std::mt19937 randgen(seed());
+    // std::uniform_int_distribution<uint32_t> randdist{0, static_cast<unsigned int>(rows_mapped_by_payoff.back().size())};
 
-    auto iter = rows_mapped_by_payoff.back().begin();
-    std::advance(iter, randdist(randgen));
+    // auto iter = rows_mapped_by_payoff.back().begin();
+    // std::advance(iter, randdist(randgen));
 
-    coordinates seat = *iter;
+    // coordinates seat = *iter;
 
-    rows[seat.first][seat.second] = toSit.ID;
+    // rows[seat.first][seat.second] = toSit.ID;
 
-    cout << "Sat student " << toSit.ID << " at seat (" << seat.first << "," << seat.second << ") for distance from others: " << closest_student_dist[seat.first][seat.second] << 
-    " and payoff: " <<  min(closest_student_dist[seat.first][seat.second], toSit.max_utility) <<  endl << endl;
-    students[number_sat].sitting = true;
+    // cout << "Sat student " << toSit.ID << " at seat (" << seat.first << "," << seat.second << ") for distance from others: " << closest_student_dist[seat.first][seat.second] << 
+    // " and payoff: " <<  min(closest_student_dist[seat.first][seat.second], toSit.max_utility) <<  endl << endl;
+    // students[number_sat].sitting = true;
 
-    reCalcDistances(seat.first, toSit);
-    reCalcPayoffs(seat.first, toSit);
 
-    number_sat++;
+
+    // reCalcDistances(seat.first, toSit);
+    // reCalcPayoffs(seat.first, toSit);
+
+    // number_sat++;
 }
 
-void Classroom::reCalcDistances(int row_num, Student& lastSeated){
+void Classroom::reCalcDistances(int row_num){
+    // This function updates the distances to the nearest student after a person has been seated
+    // we will be using layout[row_num], as it is the only row that has been changed
     
-    // Previous logic wasn't working well.
-    /*
-    // we will be working with rows[row_num] and closest_student_dist[row_num]
-    for (int i = 0; i < col_count; i++){
-        // cout << "updating seat: " << i << endl;
-        if (rows[row_num][i] != -1){
-            // This seat is occupied, so it has a distance of 0
+    // first, iterate through all the seats in that row, recalculating the payoff at each one
+    for (int i =0; i < col_count; i++){
+        // cout << "examining row " << row_num << " col: " << i << endl;
+        if (layout[row_num][i].size() > 1){
+            // cout <<" more than 2 students in seat " << endl;
+            // there are more than 2 students in this seat. The distance is 0
             closest_student_dist[row_num][i] = 0;
+            
         } else {
-            // we have an open seat (dist >=1)
-            closest_student_dist[row_num][i] = 1;
-            // now we increment it until we reach an impediment (student or end of row) on either side
+            // cout << "less than 2 students in seat" << endl;
+            // This seat is occupied by one student, or by none. The calculations are the same for either (distance is at least 1)
+            // distance to student on the left
             int l_dist = 1;
-            int r_dist =1;
-            while (i-l_dist >= 0 && rows[row_num][i - l_dist] == -1){
-                // cout << "decrementing left" << endl;
-                closest_student_dist[row_num][i]++;
-                l_dist++;
-            }
+            // distance to the student on the right
+            int r_dist = 1;
+            // boolean for the space remaining, to calculate it for the loop
+            bool space_remains = true;
+            // while loop determines how much space is to the left of the seat i
+            while (space_remains){
+                if(i - l_dist < 0){
+                    //  spot i-l_dist is a wall, so the l_dist is maximum, and we break loop
+                    l_dist = max_utility;
+                    space_remains = false;
+                } else {
+                    // we have not reached a wall, so there is a valid space to the left, we must check if it is occupied or not
+                    if(layout[row_num][i-l_dist].size() > 0){
+                        // there is a person on space i-l_dist
+                        space_remains = false;
 
-            while (i+r_dist < col_count && rows[row_num][i + r_dist] == -1){
-                // cout << "incrementing right" << endl;
-                closest_student_dist[row_num][i]++;
-                r_dist++;
+                    } else {
+                        // there is not a person on the left, we increment l_dist unless it is already the max
+                        l_dist++;
+                        if (l_dist >= max_utility){
+                            space_remains = false;
+                        }
+                        
+                    }
+                }
             }
+            // cout << "got l_dist to be " << l_dist;
+
+            space_remains = true;
+            // while loop to determine how much space is to the right of seat i
+            while(space_remains){
+                if (i+r_dist >= col_count){
+                    // the spot i + r_dist is a wall, so the r_dist is maximum and we break
+                    r_dist = max_utility;
+                    space_remains = false;
+                } else {
+                    // there is a spot at i + r_dist
+                    // is there a person at that spot?
+                    if (layout[row_num][i+r_dist].size() > 0){
+                        // there is a person on space i + r_dist, so the r_dist is maximum. we break loop
+                        space_remains = false;
+                    } else {
+                        // there is not a person on the space i + r_dist, so we increment the r_dist unless it is already the max
+                        r_dist ++;
+                        if (r_dist >= max_utility){
+                            // we already have max space on the right, so we break loop
+                            space_remains = false;
+                        }
+                    }
+                }
+            }
+            // cout << "got r_dist to be " << r_dist << endl;
+
+            // we now have the distances to the nearest player on left: l_dist, and on right: r_dist
+            // the distance is the min of these
+            // cout << min(max_utility, min(l_dist, r_dist)) << endl;
+            // cout << closest_student_dist.size();
+            // cout << closest_student_dist[0].size();
+            closest_student_dist[row_num][i] = min(max_utility, min(l_dist, r_dist));
+            // cout << "assigned the utility to be " << closest_student_dist[row_num][i] << endl;
         }
     }
+
+
+
+
+    // // Previous logic wasn't working well.
     
-    */
+    // // we will be working with rows[row_num] and closest_student_dist[row_num]
+    // for (int i = 0; i < col_count; i++){
+    //     // cout << "updating seat: " << i << endl;
+    //     if (rows[row_num][i] != -1){
+    //         // This seat is occupied, so it has a distance of 0
+    //         closest_student_dist[row_num][i] = 0;
+    //     } else {
+    //         // we have an open seat (dist >=1)
+    //         closest_student_dist[row_num][i] = 1;
+    //         // now we increment it until we reach an impediment (student or end of row) on either side
+    //         int l_dist = 1;
+    //         int r_dist =1;
+    //         while (i-l_dist >= 0 && rows[row_num][i - l_dist] == -1){
+    //             // cout << "decrementing left" << endl;
+    //             closest_student_dist[row_num][i]++;
+    //             l_dist++;
+    //         }
+
+    //         while (i+r_dist < col_count && rows[row_num][i + r_dist] == -1){
+    //             // cout << "incrementing right" << endl;
+    //             closest_student_dist[row_num][i]++;
+    //             r_dist++;
+    //         }
+    //     }
+    // }
+
+
+
     
-    // Start at beginning of each row and scan until reaching a set of students (right now can only be 1)
+    
+    
+    // // Start at beginning of each row and scan until reaching a set of students (right now can only be 1)
 
-    // Edge case: Scan until first student and fill with distance only to that student
-    bool hit = false;
-    int s = 0;
-    while (rows[row_num][s] == -1) s++; /* for set, should be testing for NOT empty instead*/
+    // // Edge case: Scan until first student and fill with distance only to that student
+    // bool hit = false;
+    // int s = 0;
+    // while (rows[row_num][s] == -1) s++; /* for set, should be testing for NOT empty instead*/
 
-    for (int k = 0; k < s; k++)
-        closest_student_dist[row_num][k] = s - k;
+    // for (int k = 0; k < s; k++)
+    //     closest_student_dist[row_num][k] = s - k;
 
-    // Now begin scanning after first student; at i = s, should hit immediately.
-    bool nexthit = false;
-    for (int i = s; i < col_count;){
-        while (!hit && i < col_count) {
-            if (rows[row_num][i] != -1 /* for set, should be testing for empty instead*/) {
-                hit = true;
-                closest_student_dist[row_num][i] = 0;
-                break;
-            }
-            i++;
-        }
+    // // Now begin scanning after first student; at i = s, should hit immediately.
+    // bool nexthit = false;
+    // for (int i = s; i < col_count;){
+    //     while (!hit && i < col_count) {
+    //         if (rows[row_num][i] != -1 /* for set, should be testing for empty instead*/) {
+    //             hit = true;
+    //             closest_student_dist[row_num][i] = 0;
+    //             break;
+    //         }
+    //         i++;
+    //     }
 
-        // Scan for next student
-        int j = i+1;
-        while (!nexthit && j < col_count) {
-            if (rows[row_num][j] != -1) {
-                nexthit = true;
-                closest_student_dist[row_num][j] = 0;
-                break;
-            }
-            j++;
-        }
+    //     // Scan for next student
+    //     int j = i+1;
+    //     while (!nexthit && j < col_count) {
+    //         if (rows[row_num][j] != -1) {
+    //             nexthit = true;
+    //             closest_student_dist[row_num][j] = 0;
+    //             break;
+    //         }
+    //         j++;
+    //     }
 
-        // Sweep middle and assign distances.
-        // When j is the end, only assign k-i as distance, for edge case.
-        for (int k = i + 1; k < j; k++) {
-            if (nexthit)
-                closest_student_dist[row_num][k] = min(k-i, j-k);
-            else
-                closest_student_dist[row_num][k] = k-i;
-        }
+    //     // Sweep middle and assign distances.
+    //     // When j is the end, only assign k-i as distance, for edge case.
+    //     for (int k = i + 1; k < j; k++) {
+    //         if (nexthit)
+    //             closest_student_dist[row_num][k] = min(k-i, j-k);
+    //         else
+    //             closest_student_dist[row_num][k] = k-i;
+    //     }
 
-        // Reset hit vars
-        hit = nexthit = false;
-        // set i to after j
-        i = j + 1;
-    }
+    //     // Reset hit vars
+    //     hit = nexthit = false;
+    //     // set i to after j
+    //     i = j + 1;
+    // }
 
     /*
     Example: 1 _ 1 1 _
@@ -325,7 +461,7 @@ void Classroom::reCalcPayoffs(int row_num, Student& lastSeated){
             // cout << "setting payout to " << temp_payoff << endl;
             */
             // Changed to cap at the maximum utlity
-            students[index].payoff = std::min(temp_payoff, students[index].max_utility);
+            students[index]->payoff = std::min(temp_payoff, students[index]->max_utility);
 
             // Categorizing payoffs into rows_mapped_by_dist
 
@@ -337,10 +473,10 @@ void Classroom::reCalcPayoffs(int row_num, Student& lastSeated){
             for (int j = 0; j < rows_mapped_by_payoff.size(); j++) {
                 set<coordinates>& current_row = rows_mapped_by_payoff[j];
                 auto found = current_row.find(coordinates(row_num,i));
-                if (found != current_row.end() && j != students[index].payoff) {
+                if (found != current_row.end() && j != students[index]->payoff) {
                     coordinates savedpair = *found;
                     current_row.erase(found);
-                    rows_mapped_by_payoff[students[index].payoff].emplace(savedpair);
+                    rows_mapped_by_payoff[students[index]->payoff].emplace(savedpair);
                     break;
                 }
             }
@@ -355,12 +491,14 @@ void Classroom::reCalcPayoffs(int row_num, Student& lastSeated){
 void Classroom::printDistances(){
     for (int i = 0; i < closest_student_dist.size(); i++){
         for (int j = 0; j < closest_student_dist[i].size(); j++){
-            if (closest_student_dist[i][j] < 10){
-                cout << "0" << closest_student_dist[i][j];
-            } else {
-                cout << closest_student_dist[i][j];
-            }
-            cout << "  ";
+            cout << "__0" << closest_student_dist[i][j] << "__"; 
+            // cout << "    ";
+            // if (closest_student_dist[i][j] < 10){
+            //     cout << "0" << closest_student_dist[i][j];
+            // } else {
+            //     cout << closest_student_dist[i][j];
+            // }
+            cout << "    ";
         }
         cout << "\n";
     }
@@ -373,35 +511,59 @@ void Classroom::printClassroom(){
     }
     cout << "PRINTING CLASSROOM----------------------------------------- \n";
     cout << "SEATS\n";
-    for (int i = 0; i < rows.size(); i++){
-        for (int j = 0; j < rows[i].size(); j++){
-            if (rows[i][j] == -1){
-                cout << "__";
-            } else if (rows[i][j] < 10){
-                cout << "0" << rows[i][j];
-            } else {
-                cout << rows[i][j];
+    // for (int i = 0; i < rows.size(); i++){
+    //     for (int j = 0; j < rows[i].size(); j++){
+    //         if (rows[i][j] == -1){
+    //             cout << "__";
+    //         } else if (rows[i][j] < 10){
+    //             cout << "0" << rows[i][j];
+    //         } else {
+    //             cout << rows[i][j];
+    //         }
+    //         cout << "  ";
+    //     }
+    //     cout << "\n";
+    // }
+
+    for (int i = 0; i < layout.size(); i++){
+        for (int j = 0; j < layout[i].size(); j++){
+            // now we are printing a specific seat
+
+            for (int k = 0; k < layout[i][j].size(); k++){
+                cout << layout[i][j][k]->ID << ",";
             }
-            cout << "  ";
-        }
-        cout << "\n";
-    }
-    cout << "PAYOFFS" << endl;
-    // print payoffs
-    for (int i = 0; i < rows.size(); i++){
-        for (int j = 0; j < rows[i].size(); j++){
-            if (rows[i][j] == -1){
+            for (int k = layout[i][j].size(); k < 3; k++){
                 cout << "__";
-            } else if (students[rows[i][j]].payoff < 10){
-                cout << "0" << students[rows[i][j]].payoff;
-            } else {
-                cout << students[rows[i][j]].payoff;
             }
-            cout << "  ";
+            cout << "    ";
+
         }
-        cout << "\n";
+        cout << endl;
     }
-    // printDistances();
+
+
+
+
+
+
+
+    // cout << "PAYOFFS" << endl;
+    // // print payoffs
+    // for (int i = 0; i < rows.size(); i++){
+    //     for (int j = 0; j < rows[i].size(); j++){
+    //         if (rows[i][j] == -1){
+    //             cout << "__";
+    //         } else if (students[rows[i][j]].payoff < 10){
+    //             cout << "0" << students[rows[i][j]].payoff;
+    //         } else {
+    //             cout << students[rows[i][j]].payoff;
+    //         }
+    //         cout << "  ";
+    //     }
+    //     cout << "\n";
+    // }
+    cout << "DISTANCES" << endl;
+    printDistances();
     cout << "\n";
     cout << "------------------------------------------------\n\n";
 }
@@ -409,13 +571,13 @@ void Classroom::printClassroom(){
 void Classroom::printStudents(){
     cout << "Printing List of Students: \n";
     for (int i = 0; i < students.size(); i++){
-        students[i].printStudent();
+        students[i]->printStudent();
     }
     cout << endl;
 }
 
 int main(){
-    int test_num = 6;
+    int test_num = 5;
 
     if (test_num == 0){
         //Doing test of classroom printing functionality
@@ -434,7 +596,7 @@ int main(){
         int utility = 3;
 
         Classroom room(num_seats, num_rows, fullness, true, utility);
-        room.students[1].printStudent();
+        room.students[1]->printStudent();
 
     }else if (test_num ==2){
         //Doing test of student list printing functionality
@@ -472,14 +634,16 @@ int main(){
 
     }  else if (test_num ==5){
         //Doing test of sitAllStudents functionality
-        int num_seats = 10;
-        int num_rows = 1;
+        int num_seats = 20;
+        int num_rows = 2;
         int fullness = 6;
         int utility = 3;
 
         Classroom room(num_seats, num_rows, fullness, true, utility);
         // room.printStudents();
         room.sitAllStudents(true);
+        // room.printClassroom();
+
     }
     else{
 
