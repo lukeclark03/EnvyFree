@@ -588,8 +588,27 @@ void Classroom::moveStudent(int ID){
     // now we recalculate the distances on that row
     reCalcDistances(best_row);
     reCalcPayoffs(best_row);
+}
 
-
+bool Classroom::canImprove(int ID){
+    int old_row = students[ID]->row;
+    int old_col = students[ID]->col;
+    int old_payoff = students[ID]->payoff;
+    // we do a test move of that student, and see if the payoff has increased, then move them back
+    moveStudent(ID);
+    // we see if the payoff has increased. 
+    bool toReturn = (students[ID]->payoff > old_payoff);
+    // now we replace the student in the original position
+    // remove them from prospective new position
+    removeStudent(ID);
+    // put them back in the old position
+    students[ID]->row = old_row;
+    students[ID]->col = old_col;
+    students[ID]->sitting = true;
+    layout[old_row][old_col].push_back(students[ID]);
+    reCalcDistances(old_row);
+    reCalcPayoffs(old_row);
+    return toReturn;
 }
 
 
@@ -601,6 +620,21 @@ void Classroom::moveStudent(int ID){
 
 
 
+
+
+
+void Classroom::whoCanImprove(){
+    // cout << "Printing List of Students: \n";
+    for (int i = 0; i < students.size(); i++){
+        students[i]->printStudent();
+        if (canImprove(i)){
+            cout << "above can improve"<< endl;
+        } else {
+            cout << "above cannot improve" << endl;
+        }
+    }
+    cout << endl;
+}
 
 
 
@@ -738,19 +772,22 @@ int main(){
         //Doing test of sitAllStudents functionality
         int num_seats = 20;
         int num_rows = 2;
-        int fullness = 6;
+        int fullness = 14;
         int utility = 3;
 
         Classroom room(num_seats, num_rows, fullness, true, utility);
         // room.printStudents();
         room.sitAllStudents(true);
-        cout << "unhappiest student: " << endl;
-        room.students[room.getUnhappiestStudent()]->printStudent();
-        cout << "moving that student" << endl;
-        room.moveStudent(room.getUnhappiestStudent());
-        // room.removeStudent(room.getUnhappiestStudent());
+        room.whoCanImprove();
         room.printClassroom();
-        room.printStudents();
+
+        // cout << "unhappiest student: " << endl;
+        // room.students[room.getUnhappiestStudent()]->printStudent();
+        // cout << "moving that student" << endl;
+        // room.moveStudent(room.getUnhappiestStudent());
+        // // room.removeStudent(room.getUnhappiestStudent());
+        // room.printClassroom();
+        // room.printStudents();
 
     }
     else{

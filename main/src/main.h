@@ -116,6 +116,8 @@ struct Classroom {
     Classroom(int seat_num, int row_count, int fullness, bool naive_, int max_util) ;
     void printClassroom();
     void printStudents();
+    void whoCanImprove();
+    
     void sitStudent();
     void sitAllStudents(bool debug);
     void reCalcDistances(int row_num);
@@ -124,6 +126,7 @@ struct Classroom {
     int getUnhappiestStudent();
     void removeStudent(int ID);
     void moveStudent(int ID);
+    bool canImprove(int ID);
 
 };
 
