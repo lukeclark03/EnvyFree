@@ -37,6 +37,7 @@ example:
  };
 
  using vectFuncts = std::vector<std::function<void(parameterlist)>>;
+ using parammap = std::map<int, parameterlist>;
 
  const std::function<Classroom(parameterlist)> setup = 
     [](parameterlist par) 

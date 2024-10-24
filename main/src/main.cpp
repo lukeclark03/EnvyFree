@@ -767,115 +767,23 @@ void Classroom::printStudents(){
 }
 
 int main(){
-    int test_num = 0;
-    bool test_list = true;
-
+    bool test_list = false;
     if (test_list) {
 
-    runTests({
-        {1,{40,2,3,3, 2}},
-    },
+    parammap test_params = {
+        /*{Index, {seats, rows, fullness, util, optional} }*/
+        {0, {40,2,3,3}},
+        /*{1,{40,2,3,3, 2}},
+        {2, {40, 2, 10, 3}},
+        {3,{10,1,3,3}},
+        {4,{10,1,3,3}},
+        {5,{5,1,3,3}},*/
+    };
+
+    runTests(test_params,
     exampletestlist);
 
-    }else if (test_num == 0){
-        //Doing test of classroom printing functionality
-        int num_seats = 40;
-        int num_rows = 2;
-        int fullness = 3;
-        int utility = 3;
-
-        Classroom room(num_seats, num_rows, fullness,  utility);
-        room.printClassroom();
-    }else if (test_num ==1){
-        //Doing test of single student printing functionality
-        int num_seats = 40;
-        int num_rows = 2;
-        int fullness = 3;
-        int utility = 3;
-
-        Classroom room(num_seats, num_rows, fullness, utility);
-        room.students[1]->printStudent();
-
-    }else if (test_num ==2){
-        //Doing test of student list printing functionality
-        int num_seats = 40;
-        int num_rows = 2;
-        int fullness = 10;
-        int utility = 3;
-
-        Classroom room(num_seats, num_rows, fullness, utility);
-        room.printStudents();
-    }else if (test_num ==3){
-        //Doing test of student distance printing functionality
-        int num_seats = 10;
-        int num_rows = 1;
-        int fullness = 3;
-        int utility = 3;
-
-        Classroom room(num_seats, num_rows, fullness, utility);
-        room.printDistances();
-    } else if (test_num ==4){
-        //Doing test of sitStudent functionality
-        int num_seats = 10;
-        int num_rows = 1;
-        int fullness = 3;
-        int utility = 3;
-
-        Classroom room(num_seats, num_rows, fullness, utility);
-        // room.printStudents();
-        room.printClassroom();
-        room.sitStudent();
-        room.printClassroom();
-        room.sitStudent();
-        room.printClassroom();
-        room.printStudents();
-
-    }  else if (test_num ==5){
-        //Doing test of sitAllStudents functionality
-        int num_seats = 5;
-        int num_rows = 1;
-        int fullness = 3;
-        int utility = 3;
-
-        Classroom room(num_seats, num_rows, fullness, utility);
-        // room.printStudents();
-        room.sitAllStudents(true);
-        room.iteratedBestResponse();
-
-        // // room.whoCanImprove();
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // room.printClassroom();
-        // room.printStudents();
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // room.printClassroom();
-        // room.printStudents();
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // room.printClassroom();
-        // room.printStudents();
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
-
-        
-        // room.printClassroom();
-        // room.printStudents();
-
-        // cout << "unhappiest student: " << endl;
-        // room.students[room.getUnhappiestStudent()]->printStudent();
-        // cout << "moving that student" << endl;
-        // room.moveStudent(room.getUnhappiestStudent());
-        // // room.removeStudent(room.getUnhappiestStudent());
-        // room.printClassroom();
-        // room.printStudents();
-
-
-
-
-    }
-    else{
+    } else {
 
         // Variables for the user to fill
         int input_students;
