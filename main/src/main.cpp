@@ -3,8 +3,6 @@
 #include <vector>
 #include <algorithm>
 #include <random>
-#include <cstdlib>
-#include <iterator>
 #include <chrono>
 using namespace std;
 
@@ -466,10 +464,6 @@ void Classroom::reCalcPayoffs(int row_num){
     }
 
 
-
-
-
-
     for (int i = 0; i < col_count; i++){
 
         int index = rows[row_num][i];
@@ -505,7 +499,7 @@ void Classroom::reCalcPayoffs(int row_num){
 
             // Find if the updated payoff is in the correct category (if it updated or not). If it isn't, j != payoff.
             // erase and emplace it into the right one.
-            for (int j = 0; j < rows_mapped_by_payoff.size(); j++) {
+            /* for (int j = 0; j < rows_mapped_by_payoff.size(); j++) {
                 set<coordinates>& current_row = rows_mapped_by_payoff[j];
                 auto found = current_row.find(coordinates(row_num,i));
                 if (found != current_row.end() && j != students[index]->payoff) {
@@ -514,7 +508,7 @@ void Classroom::reCalcPayoffs(int row_num){
                     rows_mapped_by_payoff[students[index]->payoff].emplace(savedpair);
                     break;
                 }
-            }
+            } */
 
 
         } else {
@@ -663,10 +657,6 @@ void Classroom::iteratedBestResponse(){
     }
     cout << "BEST RESPONSE TERMINATED"<< endl;
 }
-
-
-
-
 
 
 
