@@ -1,7 +1,9 @@
+#include <iterator>
 #include <vector>
 #include <iostream>
 #include <utility>
 #include <set>
+#include <algorithm>
 
 template<typename T>
 using matrix2D = std::vector<std::vector<T>>;
@@ -65,30 +67,47 @@ struct Student {
                 after = it;
         }
 
-        int dist_before = distance(before, found);
-        int dist_after = distance(found, after);
-        int index = distance(current_row.begin(), found);
+        int dist_before = std::distance(before, found);
+        int dist_after = std::distance(found, after);
+        int index = std::distance(current_row.begin(), found);
 
         // Case 1: Surrounded 1 (1) 1
         if (dist_before == 0 && dist_after == 0)
             selfdist.at(index) = 1;
         
-        // Case 2: One next, one N away
-            // two symmetrical conditions
-            // Need to add 1 to middle of N dist, from middle up to self
-        
-        // Case 3:
+        // Case 2:
             // One M away, one N away
-            // similar to above, but need to treat self as middle, incrementing from previous 2 middle values
-            // until now middle value
+            // redo by iterating from indicies of each side
+        else if (before != current_row.begin() && after != found) {// They are not the edges, which would mean they were never changed.
+            int bef_index = index - dist_before;
+            int aft_index = index + dist_after;
 
-        // Case 4:
+            for (int i = bef_index + 1; i < aft_index; i++) {
+                selfdist[i] = std::min(i - bef_index, aft_index - i);
+            }
+
+        }
+        // Case 3:
             // One of the edges is free
-            // Just keep adding past middle for other person
-
-        // Case 5:
+            // Just keep from previous middle  past middle for other person
+        else if (before == current_row.begin() && after != found) {
+            int aft_index = index + dist_after;
+            for (int i = 0; i < index + aft_index; i++) {
+                selfdist[i] = aft_index - i;
+            }
+        } else if (before != current_row.begin() && after == found) {
+            for (int i = index + 1; i < selfdist.size(); i++) {
+                selfdist[i] =  i - index;
+            }
+        }
+        // Case 4:
             /// Only one in row
             // Just take each value to be row length
+        else {
+            selfdist = std::vector<int>(selfdist.size(), selfdist.size());
+        }
+
+        return selfdist;
 
     }
 

@@ -1,7 +1,6 @@
 #include "main.h"
 #include <iostream>
 #include <vector>
-#include <algorithm>
 #include <random>
 #include <iterator>
 using namespace std;
@@ -280,6 +279,8 @@ void Classroom::reCalcDistances(int row_num, Student& lastSeated){
         // set i to after j
         i = j + 1;
     }
+
+    vector<int> test = lastSeated.withoutSelfDistances(this->rows[row_num], this->closest_student_dist[row_num]);
 
     /*
     Example: 1 _ 1 1 _
