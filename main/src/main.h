@@ -114,6 +114,7 @@ struct Classroom {
     // std::vector<int> payoffs;
 
     Classroom(int seat_num, int row_count, int fullness, bool naive_, int max_util) ;
+    ~Classroom();
     void printClassroom();
     void printStudents();
     void whoCanImprove();

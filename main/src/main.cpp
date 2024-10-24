@@ -108,6 +108,13 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_, bool naive_, 
 
 }
 
+Classroom::~Classroom(){
+    for (int i = 0; i < students.size(); i++ ){
+        delete students[i];
+    }
+}
+
+
 void Classroom::sitAllStudents(bool debug){
     // this function seats all the students in the classroom, one at a time, with or without debugging
     // seed the random number generator
