@@ -541,8 +541,21 @@ int Classroom::getUnhappiestStudent(){
 
 
 void Classroom::removeStudent(int ID){
-    // This function removes student with ID from the payoff 
+    // This function removes student with ID from the layout (and recalculates distances) 
+    // DOES NOT RECALCULATE PAYOFFS
+    // first, we get the location of that student
+    int row = students[ID]->row;
+    int col = students[ID]->col;
+    // now, we look at that cell on layout, and continue until we find that student
+    
+    int index_to_remove = find(layout[row][col].begin(), layout[row][col].end(), students[ID]) - layout[row][col].begin();
+    layout[row][col].erase(layout[row][col].begin() + index_to_remove);
+    reCalcDistances(row);
 }
+
+// void Classroom::moveStudent(int ID){
+
+// }
 
 
 
@@ -698,7 +711,9 @@ int main(){
         room.sitAllStudents(true);
         cout << "unhappiest student: " << endl;
         room.students[room.getUnhappiestStudent()]->printStudent();
-        // room.printClassroom();
+        cout << "removing that student" << endl;
+        room.removeStudent(room.getUnhappiestStudent());
+        room.printClassroom();
 
     }
     else{
