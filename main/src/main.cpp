@@ -637,6 +637,15 @@ bool Classroom::bestResponse(){
     return false;
 }
 
+void Classroom::iteratedBestResponse(){
+    // This function runs iterations of bestResponse until there is no valid move for a student
+    cout << "STARTING BEST RESPONSE ##############################################################" << endl;
+    while(bestResponse()){
+        printClassroom();
+        printStudents();
+    }
+    cout << "BEST RESPONSE TERMINATED"<< endl;
+}
 
 
 
@@ -646,7 +655,7 @@ bool Classroom::bestResponse(){
 
 
 
-
+// PRINTING CODE BELOW #################################################################################################################3
 
 
 void Classroom::whoCanImprove(){
@@ -663,7 +672,6 @@ void Classroom::whoCanImprove(){
 }
 
 
-// PRINTING CODE BELOW #################################################################################################################3
 
 
 void Classroom::printClassroom(){
@@ -804,20 +812,28 @@ int main(){
         Classroom room(num_seats, num_rows, fullness, true, utility);
         // room.printStudents();
         room.sitAllStudents(true);
-        // room.whoCanImprove();
-        room.bestResponse();
-                room.printClassroom();
-        room.printStudents();
-        room.bestResponse();
-                room.printClassroom();
-        room.printStudents();
-        room.bestResponse();
-                room.printClassroom();
-        room.printStudents();
-        room.bestResponse();
+        room.iteratedBestResponse();
+
+        // // room.whoCanImprove();
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // room.printClassroom();
+        // room.printStudents();
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // room.printClassroom();
+        // room.printStudents();
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // room.printClassroom();
+        // room.printStudents();
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+        // if (!room.bestResponse()){cout << "NO ONE MOVED" << endl;};
+
         
-        room.printClassroom();
-        room.printStudents();
+        // room.printClassroom();
+        // room.printStudents();
 
         // cout << "unhappiest student: " << endl;
         // room.students[room.getUnhappiestStudent()]->printStudent();
