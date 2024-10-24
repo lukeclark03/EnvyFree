@@ -67,7 +67,7 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_, bool naive_, 
     for (int i = 0; i < row_count; i++){
         temp_row.clear();
         for (int j = 0; j < col_count; j++){
-            temp_row.push_back(col_count+1);
+            temp_row.push_back(col_count);
 
             // fill in payoffs as all at 0 payoff, so the first iteration is all random.
             rows_mapped_by_payoff.back().emplace(coordinates(i,j));
@@ -175,9 +175,7 @@ void Classroom::sitStudent(){
         // TODO: implement ungreedy functionality here
     }
     */
-
     
-
     // Find maximum possible payoff
     // Select a random one of the maxiumum payoff seats
     // Since payoffs are already capped at the max set by the user
@@ -204,6 +202,9 @@ void Classroom::sitStudent(){
 }
 
 void Classroom::reCalcDistances(int row_num){
+    
+    // Previous logic wasn't working well.
+    /*
     // we will be working with rows[row_num] and closest_student_dist[row_num]
     for (int i = 0; i < col_count; i++){
         // cout << "updating seat: " << i << endl;
@@ -212,7 +213,7 @@ void Classroom::reCalcDistances(int row_num){
             closest_student_dist[row_num][i] = 0;
         } else {
             // we have an open seat (dist >=1)
-            closest_student_dist[row_num][i] = 2;
+            closest_student_dist[row_num][i] = 1;
             // now we increment it until we reach an impediment (student or end of row) on either side
             int l_dist = 1;
             int r_dist =1;
@@ -229,8 +230,72 @@ void Classroom::reCalcDistances(int row_num){
             }
         }
     }
+    
+    */
+    
+    
+    // Start at beginning of each row and scan until reaching a set of students (right now can only be 1)
+
+    // Edge case: Scan until first student and fill with distance only to that student
+    bool hit = false;
+    int s = 0;
+    while (rows[row_num][s] == -1) s++; /* for set, should be testing for NOT empty instead*/
+
+    for (int k = 0; k < s; k++)
+        closest_student_dist[row_num][k] = s - k;
+
+    // Now begin scanning after first student; at i = s, should hit immediately.
+    bool nexthit = false;
+    for (int i = s; i < col_count;){
+        while (!hit && i < col_count) {
+            if (rows[row_num][i] != -1 /* for set, should be testing for empty instead*/) {
+                hit = true;
+                closest_student_dist[row_num][i] = 0;
+                break;
+            }
+            i++;
+        }
+
+        // Scan for next student
+        int j = i+1;
+        while (!nexthit && j < col_count) {
+            if (rows[row_num][j] != -1) {
+                nexthit = true;
+                closest_student_dist[row_num][j] = 0;
+                break;
+            }
+            j++;
+        }
+
+        // Sweep middle and assign distances.
+        // When j is the end, only assign k-i as distance, for edge case.
+        for (int k = i + 1; k < j; k++) {
+            if (nexthit)
+                closest_student_dist[row_num][k] = min(k-i, j-k);
+            else
+                closest_student_dist[row_num][k] = k-i;
+        }
+
+        // Reset hit vars
+        hit = nexthit = false;
+        // set i to after j
+        i = j + 1;
+    }
+
+    /*
+    Example: 1 _ 1 1 _
+    Scan until hit student...
+    hits student at i = 0, assigns 0
+    scans i=1, finds nothing
+    scans i=2, finds student, assigns 0
+    last student set was i=0
+    fill triangularly student /\ student
+    this case should be 1 in i=1... etc.
+
+    */
 
 }
+
 
 void Classroom::reCalcPayoffs(int row_num){
     // we will be working with rows[row_num] and closest_student_dist[row_num]
