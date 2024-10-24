@@ -117,7 +117,7 @@ struct Classroom {
     void printClassroom();
     void printStudents();
     void whoCanImprove();
-    
+
     void sitStudent();
     void sitAllStudents(bool debug);
     void reCalcDistances(int row_num);
@@ -127,6 +127,7 @@ struct Classroom {
     void removeStudent(int ID);
     void moveStudent(int ID);
     bool canImprove(int ID);
+    bool bestResponse();
 
 };
 

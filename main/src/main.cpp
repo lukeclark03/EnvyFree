@@ -523,7 +523,7 @@ void Classroom::printDistances(){
     }
 }
 
-// ITERATED BEST RESPONSE CODE BELOW
+// ITERATED BEST RESPONSE CODE BELOW #######################################################################################
 int Classroom::getUnhappiestStudent(){
     // This function returns the ID of the minimum payoff student
     int min_student = -1;
@@ -591,6 +591,7 @@ void Classroom::moveStudent(int ID){
 }
 
 bool Classroom::canImprove(int ID){
+    // This function determines if the student with ID can improve their payoff by moving
     int old_row = students[ID]->row;
     int old_col = students[ID]->col;
     int old_payoff = students[ID]->payoff;
@@ -609,6 +610,31 @@ bool Classroom::canImprove(int ID){
     reCalcDistances(old_row);
     reCalcPayoffs(old_row);
     return toReturn;
+}
+
+
+bool Classroom::bestResponse(){
+    // this function runs one iteration of the best response, and returns a boolean that is true if someone changed their spot, and false otherwise.
+    vector<int> unhappiestStudentIDs;
+    int least_happy_ID = getUnhappiestStudent();
+    int smallest_payoff = students[least_happy_ID]->payoff;
+    bool someoneImproved = false;
+    // we need to offer all the unhappiest students an opportunity to change, and if they do, we return (those with the same payoff as smallest payoff)
+    // loop through all students
+    for (int i = 0; i < students.size(); i++){
+        if(students[i]->payoff == smallest_payoff){
+            // we have a least happy student, we offer them a change
+            if (canImprove(i)){
+                // student i can improve, so we move them and return
+                moveStudent(i);
+                cout << "BEST RESPONSE: MOVED STUDENT: " << i << endl;
+                return true;
+            }
+            // no else statement: if that student can't move we ignore them
+        }
+        // no else statement: if that student doesn't have min payoff, we ignore them
+    }
+    return false;
 }
 
 
@@ -637,7 +663,7 @@ void Classroom::whoCanImprove(){
 }
 
 
-
+// PRINTING CODE BELOW #################################################################################################################3
 
 
 void Classroom::printClassroom(){
@@ -772,14 +798,26 @@ int main(){
         //Doing test of sitAllStudents functionality
         int num_seats = 20;
         int num_rows = 2;
-        int fullness = 14;
+        int fullness = 8;
         int utility = 3;
 
         Classroom room(num_seats, num_rows, fullness, true, utility);
         // room.printStudents();
         room.sitAllStudents(true);
-        room.whoCanImprove();
+        // room.whoCanImprove();
+        room.bestResponse();
+                room.printClassroom();
+        room.printStudents();
+        room.bestResponse();
+                room.printClassroom();
+        room.printStudents();
+        room.bestResponse();
+                room.printClassroom();
+        room.printStudents();
+        room.bestResponse();
+        
         room.printClassroom();
+        room.printStudents();
 
         // cout << "unhappiest student: " << endl;
         // room.students[room.getUnhappiestStudent()]->printStudent();
