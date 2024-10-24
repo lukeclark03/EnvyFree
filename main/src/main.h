@@ -119,6 +119,7 @@ struct Classroom {
     void reCalcDistances(int row_num);
     void reCalcPayoffs(int row_num);
     void printDistances();
+    int getUnhappiestStudent();
 };
 
 class Game{

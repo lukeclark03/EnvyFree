@@ -521,6 +521,36 @@ void Classroom::printDistances(){
     }
 }
 
+// ITERATED BEST RESPONSE CODE BELOW
+int Classroom::getUnhappiestStudent(){
+    int min_student = -1;
+    int min_payoff = max_utility + 1; 
+    
+    for (int i = 0; i < students.size(); i++){
+        if (students[i]->payoff < min_payoff){
+            // we have a new unhappiest student
+            min_student = i;
+            min_payoff = students[i]->payoff;
+        }
+    }
+    return min_student;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void Classroom::printClassroom(){
     if (rows.empty()){
         cout << "CANNOT PRINT AN EMPTY CLASSROOM \n";
@@ -659,6 +689,8 @@ int main(){
         Classroom room(num_seats, num_rows, fullness, true, utility);
         // room.printStudents();
         room.sitAllStudents(true);
+        cout << "unhappiest student: " << endl;
+        room.students[room.getUnhappiestStudent()]->printStudent();
         // room.printClassroom();
 
     }
