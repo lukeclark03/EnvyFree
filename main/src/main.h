@@ -1,7 +1,9 @@
+#include <iterator>
 #include <vector>
 #include <iostream>
 #include <utility>
 #include <set>
+#include <algorithm>
 
 template<typename T>
 using matrix2D = std::vector<std::vector<T>>;
@@ -31,7 +33,7 @@ struct Student {
         if (ID < 10){std::cout << "0";}
         std::cout << ID << " ";
         if (sitting){
-            std::cout << "has   been  sat at row " << row << " and column " << col<< ", ";
+            std::cout << "has been sat at row " << row << " and column " << col << ", ";
         } else {
             std::cout << "hasn't been sat, ";
         }
@@ -43,56 +45,75 @@ struct Student {
         if (payoff == -1){
             std::cout << "and has no payoff\n";
         } else {
-            std::cout << "and has payout: " << payoff << std::endl;
-            // std::cout << "and has preferred maximum utility: " << max_utility << "\n";
+            std::cout << "and has payoff: " << payoff << "\n";
+            // Implemented per student if we want to include personal space as a factor, for example
+            std::cout << "and has preferred maximum utility: " << max_utility << "\n";  
         }
     }
 
-    // std::vector<int> withoutSelfDistances(std::vector<int>& current_row, std::vector<int>& current_row_distances) {
+    //  Keep for future if needed
+    std::vector<int> withoutSelfDistances(std::vector<int>& current_row, std::vector<int>& current_row_distances) {
         
-    //     std::vector<int> selfdist(current_row_distances);
-    //     // Add case where set where seat is more than 1 -> no change in vector
-    //     // return current_row;
-    //     auto found = find(current_row.begin(),current_row.end(), this->ID);
+        std::vector<int> selfdist(current_row_distances);
+        // Add case where set where seat is more than 1 -> no change in vector
+        // return current_row;
+        auto found = find(current_row.begin(),current_row.end(), this->ID);
 
-    //     auto before = current_row.begin();
-    //     for (auto it = current_row.begin(); it != found; it++) {
-    //         if (*it != -1)
-    //             before = it;
-    //     }
+        auto before = current_row.begin();
+        for (auto it = current_row.begin(); it != found; it++) {
+            if (*it != -1)
+                before = it;
+        }
 
-    //     auto after = found;
-    //     for (auto it = found; it != current_row.end(); it++) {
-    //         if (*it != -1)
-    //             after = it;
-    //     }
+        auto after = found;
+        for (auto it = found; it != current_row.end(); it++) {
+            if (*it != -1)
+                after = it;
+        }
 
-    //     int dist_before = distance(before, found);
-    //     int dist_after = distance(found, after);
-    //     int index = distance(current_row.begin(), found);
+        int dist_before = std::distance(before, found);
+        int dist_after = std::distance(found, after);
+        int index = std::distance(current_row.begin(), found);
 
-    //     // Case 1: Surrounded 1 (1) 1
-    //     if (dist_before == 0 && dist_after == 0)
-    //         selfdist.at(index) = 1;
+        // Case 1: Surrounded 1 (1) 1
+        if (dist_before == 0 && dist_after == 0)
+            selfdist.at(index) = 1;
         
-    //     // Case 2: One next, one N away
-    //         // two symmetrical conditions
-    //         // Need to add 1 to middle of N dist, from middle up to self
-        
-    //     // Case 3:
-    //         // One M away, one N away
-    //         // similar to above, but need to treat self as middle, incrementing from previous 2 middle values
-    //         // until now middle value
+        // Case 2:
+            // One M away, one N away
+            // redo by iterating from indicies of each side
+        else if (before != current_row.begin() && after != found) {// They are not the edges, which would mean they were never changed.
+            int bef_index = index - dist_before;
+            int aft_index = index + dist_after;
 
-    //     // Case 4:
-    //         // One of the edges is free
-    //         // Just keep adding past middle for other person
+            for (int i = bef_index + 1; i < aft_index; i++) {
+                selfdist[i] = std::min(i - bef_index, aft_index - i);
+            }
 
-    //     // Case 5:
-    //         /// Only one in row
-    //         // Just take each value to be row length
+        }
+        // Case 3:
+            // One of the edges is free
+            // Just keep from previous middle  past middle for other person
+        else if (before == current_row.begin() && after != found) {
+            int aft_index = index + dist_after;
+            for (int i = 0; i < index + aft_index; i++) {
+                selfdist[i] = aft_index - i;
+            }
+        } else if (before != current_row.begin() && after == found) {
+            for (int i = index + 1; i < selfdist.size(); i++) {
+                selfdist[i] =  i - index;
+            }
+        }
+        // Case 4:
+            /// Only one in row
+            // Just take each value to be row length
+        else {
+            selfdist = std::vector<int>(selfdist.size(), selfdist.size());
+        }
 
-    // }
+        return selfdist;
+
+    }
 
 };
 
@@ -110,7 +131,7 @@ struct Classroom {
     matrix2D<int> closest_student_dist;
     std:: vector<std::vector<std::vector<Student*>>> layout;
     std::vector<Student*> students;
-    indexed_set_container rows_mapped_by_payoff;
+    //indexed_set_container rows_mapped_by_payoff; //unused for now
     // std::vector<int> payoffs;
 
     Classroom(int seat_num, int row_count, int fullness, bool naive_, int max_util) ;
