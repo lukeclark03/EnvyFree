@@ -21,6 +21,8 @@ struct Student {
     // integer for the payoff amount
     int payoff;
     int max_utility;
+    int row = -1;
+    int col = -1;
 
     Student(int greedy, int preferred_row, int ID, bool sitting, int payoff, int max_utility)
         : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff), max_utility(max_utility) {};
@@ -29,7 +31,7 @@ struct Student {
         if (ID < 10){std::cout << "0";}
         std::cout << ID << " ";
         if (sitting){
-            std::cout << "has   been  sat, ";
+            std::cout << "has   been  sat at row " << row << " and column " << col<< ", ";
         } else {
             std::cout << "hasn't been sat, ";
         }
@@ -120,6 +122,8 @@ struct Classroom {
     void reCalcPayoffs(int row_num);
     void printDistances();
     int getUnhappiestStudent();
+    void removeStudent(int ID);
+
 };
 
 class Game{

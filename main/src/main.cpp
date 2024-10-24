@@ -163,6 +163,8 @@ void Classroom::sitStudent(){
     //increment the number of students that have been sat
     number_sat++;
     toSit->sitting = true;
+    toSit->row = rand_row;
+    toSit->col = rand_col;
     // cout << "finished sitting students" << endl;
 
 
@@ -523,6 +525,7 @@ void Classroom::printDistances(){
 
 // ITERATED BEST RESPONSE CODE BELOW
 int Classroom::getUnhappiestStudent(){
+    // This function returns the ID of the minimum payoff student
     int min_student = -1;
     int min_payoff = max_utility + 1; 
     
@@ -536,6 +539,10 @@ int Classroom::getUnhappiestStudent(){
     return min_student;
 }
 
+
+void Classroom::removeStudent(int ID){
+    // This function removes student with ID from the payoff 
+}
 
 
 
