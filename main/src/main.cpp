@@ -5,6 +5,7 @@
 #include <random>
 #include <cstdlib>
 #include <iterator>
+#include <chrono>
 using namespace std;
 
 
@@ -118,8 +119,8 @@ Classroom::~Classroom(){
 void Classroom::sitAllStudents(bool debug){
     // this function seats all the students in the classroom, one at a time, with or without debugging
     // seed the random number generator
-    srand((unsigned) time(NULL));
-
+   
+    
     if (debug){
         printClassroom();
         printStudents();
@@ -148,13 +149,21 @@ void Classroom::sitStudent(){
     // get the current student who needs to sit
     Student* toSit = students[number_sat];
     cout << "sitting a student: " << toSit->ID << endl;
-
-
-
+    
+    std::mt19937_64 twister(
+        (mt19937_64::result_type)
+        std::chrono::high_resolution_clock::now().time_since_epoch().count()
+    );
+    std::uniform_int_distribution<> randgen_row{0,row_count - 1 };
+    std::uniform_int_distribution<> randgen_col{0,col_count - 1 };
     // get a random row
-    int rand_row = rand() % row_count;
+    int rand_row = randgen_row(twister);
+
+    cout << "Random Row: " << rand_row << endl;
     // get a random column
-    int rand_col = rand() % col_count;
+    int rand_col = randgen_col(twister);
+
+    cout << "Random col: " << rand_col << endl;
 
     // cout << "sitting student randomly at row " << rand_row << "and col: " << rand_col << endl;
     // add the student to that spot
@@ -769,7 +778,7 @@ void Classroom::printStudents(){
 }
 
 int main(){
-    int test_num = 5;
+    int test_num = -1;
 
     if (test_num == 0){
         //Doing test of classroom printing functionality
