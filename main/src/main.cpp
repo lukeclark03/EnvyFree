@@ -551,11 +551,46 @@ void Classroom::removeStudent(int ID){
     int index_to_remove = find(layout[row][col].begin(), layout[row][col].end(), students[ID]) - layout[row][col].begin();
     layout[row][col].erase(layout[row][col].begin() + index_to_remove);
     reCalcDistances(row);
+    reCalcPayoffs(row);
+    students[ID]->sitting = false;
 }
 
-// void Classroom::moveStudent(int ID){
+void Classroom::moveStudent(int ID){
+    // This function will move a student with the input ID to a (presumably better) spot. 
+    // Will choose the best available spot
 
-// }
+    removeStudent(ID);
+
+    // now we need to find the highest spot on the closest_student_distances 
+    int best_row = 0;
+    int best_col = 0;
+    int best_payoff = 0;
+
+    // we loop through every seat in the room, looking at closest student dist, and ensuring that it is empty
+    for (int i = 0; i < row_count; i ++){
+        for (int j = 0; j < col_count; j++){
+            // we are at a specific seat, we only do anything if we have not already found a maximal seat
+            if (best_payoff < max_utility){
+                if (best_payoff < closest_student_dist[i][j] && layout[i][j].size() == 0){
+                    // we have found an empty seat (i, j) that is better
+                    best_row = i;
+                    best_col = j;
+                    best_payoff = closest_student_dist[i][j];
+                }
+            } 
+        }
+    }
+    // now that we have the best seat, we sit the student there.
+    students[ID]->row = best_row;
+    students[ID]->col = best_col;
+    students[ID]->sitting = true;
+    layout[best_row][best_col].push_back(students[ID]);
+    // now we recalculate the distances on that row
+    reCalcDistances(best_row);
+    reCalcPayoffs(best_row);
+
+
+}
 
 
 
@@ -711,9 +746,11 @@ int main(){
         room.sitAllStudents(true);
         cout << "unhappiest student: " << endl;
         room.students[room.getUnhappiestStudent()]->printStudent();
-        cout << "removing that student" << endl;
-        room.removeStudent(room.getUnhappiestStudent());
+        cout << "moving that student" << endl;
+        room.moveStudent(room.getUnhappiestStudent());
+        // room.removeStudent(room.getUnhappiestStudent());
         room.printClassroom();
+        room.printStudents();
 
     }
     else{

@@ -123,7 +123,7 @@ struct Classroom {
     void printDistances();
     int getUnhappiestStudent();
     void removeStudent(int ID);
-    // void moveStudent(int ID);
+    void moveStudent(int ID);
 
 };
 
