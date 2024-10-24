@@ -523,21 +523,7 @@ void Classroom::reCalcPayoffs(int row_num){
     }
 }
 
-void Classroom::printDistances(){
-    for (int i = 0; i < closest_student_dist.size(); i++){
-        for (int j = 0; j < closest_student_dist[i].size(); j++){
-            cout << "__0" << closest_student_dist[i][j] << "__"; 
-            // cout << "    ";
-            // if (closest_student_dist[i][j] < 10){
-            //     cout << "0" << closest_student_dist[i][j];
-            // } else {
-            //     cout << closest_student_dist[i][j];
-            // }
-            cout << "    ";
-        }
-        cout << "\n";
-    }
-}
+
 
 // ITERATED BEST RESPONSE CODE BELOW #######################################################################################
 int Classroom::getUnhappiestStudent(){
@@ -650,6 +636,21 @@ bool Classroom::bestResponse(){
         }
         // no else statement: if that student doesn't have min payoff, we ignore them
     }
+    // none of the lowest students moved, so we need to check all the students to see if there are any edge moves
+    for (int i = 0; i < students.size(); i++){
+        if(students[i]->payoff == smallest_payoff){
+            // we have a least happy student, we ignore them (since we already got them)
+            
+        } else {
+            if (canImprove(i)){
+                // student i can improve, so we move them and return
+                moveStudent(i);
+                cout << "BEST RESPONSE (EDGE MOVE): MOVED STUDENT: " << i << endl;
+                return true;
+            }
+        }
+        // no else statement: if that student doesn't have min payoff, we ignore them
+    }
     return false;
 }
 
@@ -672,7 +673,21 @@ void Classroom::iteratedBestResponse(){
 
 
 // PRINTING CODE BELOW #################################################################################################################3
-
+void Classroom::printDistances(){
+    for (int i = 0; i < closest_student_dist.size(); i++){
+        for (int j = 0; j < closest_student_dist[i].size(); j++){
+            cout << "__0" << closest_student_dist[i][j] << "__"; 
+            // cout << "    ";
+            // if (closest_student_dist[i][j] < 10){
+            //     cout << "0" << closest_student_dist[i][j];
+            // } else {
+            //     cout << closest_student_dist[i][j];
+            // }
+            cout << "    ";
+        }
+        cout << "\n";
+    }
+}
 
 void Classroom::whoCanImprove(){
     // cout << "Printing List of Students: \n";
@@ -820,9 +835,9 @@ int main(){
 
     }  else if (test_num ==5){
         //Doing test of sitAllStudents functionality
-        int num_seats = 20;
-        int num_rows = 2;
-        int fullness = 8;
+        int num_seats = 5;
+        int num_rows = 1;
+        int fullness = 3;
         int utility = 3;
 
         Classroom room(num_seats, num_rows, fullness, true, utility);
