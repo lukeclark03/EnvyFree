@@ -41,8 +41,8 @@ struct Student {
         if (payoff == -1){
             std::cout << "and has no payoff\n";
         } else {
-            std::cout << "and has payout: " << payoff << "\n";
-            std::cout << "and has preferred maximum utility: " << max_utility << "\n";
+            std::cout << "and has payout: " << payoff << std::endl;
+            // std::cout << "and has preferred maximum utility: " << max_utility << "\n";
         }
     }
 
@@ -117,7 +117,7 @@ struct Classroom {
     void sitStudent();
     void sitAllStudents(bool debug);
     void reCalcDistances(int row_num);
-    void reCalcPayoffs(int row_num, Student& lastSeated);
+    void reCalcPayoffs(int row_num);
     void printDistances();
 };
 

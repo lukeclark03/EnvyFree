@@ -149,19 +149,21 @@ void Classroom::sitStudent(){
     // get a random column
     int rand_col = rand() % col_count;
 
-    cout << "sitting student randomly at row " << rand_row << "and col: " << rand_col << endl;
+    // cout << "sitting student randomly at row " << rand_row << "and col: " << rand_col << endl;
     // add the student to that spot
     toSit->printStudent();
     layout[rand_row][rand_col].push_back(toSit);
 
     // recalculate the distances and payoffs for the row the student sat in
     reCalcDistances(rand_row);
-    cout << "finished reCalcDsitances" << endl;
+    reCalcPayoffs(rand_row);
+    // cout << "finished reCalcDsitances" << endl;
     // reCalcPayoffs(rand_row, toSit);
 
     //increment the number of students that have been sat
     number_sat++;
-    cout << "finished sitting students" << endl;
+    toSit->sitting = true;
+    // cout << "finished sitting students" << endl;
 
 
 
@@ -432,9 +434,24 @@ void Classroom::reCalcDistances(int row_num){
 }
 
 
-void Classroom::reCalcPayoffs(int row_num, Student& lastSeated){
-    // we will be working with rows[row_num] and closest_student_dist[row_num]
+void Classroom::reCalcPayoffs(int row_num){
+    // we will be working with layout[row_num] and closest_student_dist[row_num]
     // cout << "recalculating payoffs" << endl;
+
+    // now we go through the entire layout and assign to each person at a spot the payoff of that spot
+    for (int i = 0; i < col_count; i++){
+        // we are considering cell layout[row_num][i]
+        for (int j =0; j < layout[row_num][i].size(); j++){
+            // we consider each person seated at that row
+            layout[row_num][i][j]->payoff = closest_student_dist[row_num][i];
+        }
+    }
+
+
+
+
+
+
     for (int i = 0; i < col_count; i++){
 
         int index = rows[row_num][i];
