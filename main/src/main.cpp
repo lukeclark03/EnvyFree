@@ -123,6 +123,118 @@ vector<int> Classroom::getStudentUtilities(){
     }
 
 
+void Classroom::sitStudentAt(int row, int col){
+    if (number_sat >= fullness){
+        throw invalid_argument("Cannot sit another student, everyone has been sat");
+    }
+    layout[row][col].push_back(students[number_sat]);
+    students[number_sat]->sitting = true;
+    students[number_sat]->row = row;
+    students[number_sat]->col = col;
+    number_sat++;
+    reCalcDistances(row);
+}
+
+
+void Classroom::sitAllStudentsNash(){
+    for (int i = 0; i < row_count; i++){
+        // for loop for each row, we begin sitting students inwards
+        int dist_from_edge = 0;
+        // while loop for seating them from the edges inwards
+        if (number_sat >= fullness){
+            return;
+        }
+        while (dist_from_edge/3 < (col_count + 2)/6){
+            // we can seat a student at dist_from edge on both sides and keep everyone getting 3
+            sitStudentAt(i, dist_from_edge);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+            sitStudentAt(i, col_count - dist_from_edge -1);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+            reCalcPayoffs(i);
+
+            //increment the number of students that have been sat
+            dist_from_edge += 3;
+            // cout << "incremented edge distance" << endl;
+        }
+        // reCalcPayoffs
+    }
+    // we have sat all students on the edge, now we deal with the middle
+    for (int i = 0; i < row_count; i++){
+        if (col_count % 6 == 1){
+            // there is a middle spot with utility of 3 that doesn't harm anyone
+            sitStudentAt(i, col_count/2);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+        } else if (col_count % 6 == 2){
+            // there are two middle seats, one gets the acutal middle, one gets one closed to the edge
+            sitStudentAt(i, col_count/2);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+
+            sitStudentAt(i, col_count/2 -2);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+        } else if (col_count % 6 == 3){
+            sitStudentAt(i, col_count/2 +1);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+
+            sitStudentAt(i, col_count/2 -1);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+        } else if (col_count % 6 == 4){
+            // don't do anything, they are sat well
+        } else if (col_count % 6 == 5){
+            // sit them in the middle spot
+            sitStudentAt(i, col_count/2);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            }
+        } else if (col_count % 6 == 0){
+            // sit them in the middle spot
+            sitStudentAt(i, col_count/2);
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            } 
+        }
+        reCalcPayoffs(i);
+    }
+
+    // now we still have students, so some people are going to get a utility of 1
+    for(int i = 0; i < row_count; i++){
+        for (int j = 0; j < col_count; j++){
+            if (layout[i][j].size() == 0){
+                sitStudentAt(i, j);
+            }
+            if (number_sat >= fullness){
+                reCalcPayoffs(i);
+                return;
+            } 
+        }
+        reCalcPayoffs(i);
+    }
+}
+
+
+
 void Classroom::sitAllStudents(bool debug){
     // this function seats all the students in the classroom, one at a time, with or without debugging
     // seed the random number generator
@@ -785,7 +897,7 @@ void Classroom::printStudents(){
 int main(){
     int choice;
     cout << "Options: " << endl;
-    cout << "1. Aggregate test: 1000 cases" << endl;
+    cout << "1. Aggregate test: N cases" << endl;
     cout << "2. Single test" << endl;
     cin >>  choice;
 
@@ -799,14 +911,13 @@ int main(){
         int iterations;
 
         // Take in seats, students, rows
+        cout << "Utility = 3." << endl;
         cout << "Number of Seats: ";
         cin >> num_seats;
         cout << "Number of Students: ";
         cin >> fullness;
         cout << "Number of Rows: ";
         cin >> num_rows;
-        cout << "Utility Threshold: ";
-        cin >> utility;
         cout << "Number of Iterations: ";
         cin >> iterations;
 
@@ -842,6 +953,17 @@ int main(){
         average_utility /= iterations;
         avg_number_of_moves /= iterations;
 
+        Classroom nash(num_seats, num_rows, fullness, utility);
+        nash.sitAllStudentsNash();
+        int best_nash_turns = nash.iteratedBestResponse();
+        vector<int> nash_utility = nash.getStudentUtilities();
+        int total_nash_util = 1 * nash_utility[1] + 2 * nash_utility[2] + 3 * nash_utility[3];
+        int nash_average = total_nash_util / fullness;
+        cout << "RESULTS --------------------------" << endl;
+        cout << "Approximately optimal nash took " << best_nash_turns << " times to reach a Nash" << endl;
+        cout << "With average utility of " << average_utility << endl << endl;
+        
+        cout << "Aggregate random seeding: " << endl;
         cout << "Number of Iterations: " << iterations << endl;
         cout << "Average Utility: " << average_utility << endl;
         cout << "Average Number of Moves: " << avg_number_of_moves << endl;
@@ -893,8 +1015,7 @@ int main(){
         // Create classroom and seat students
         Classroom room(input_seats, input_rows, input_students, input_maxutil);
         cout << "Created Classroom. Seating all students" << endl;
-        room.sitAllStudents(false);
-        room.printClassroom();
+        room.sitAllStudents(true);
         room.iteratedBestResponse();
 
         // vector<Student> students = initStudents(num_seats / fullness , num_greedy);
@@ -902,7 +1023,6 @@ int main(){
         // Class.rows = fillrows(num_seats / fullness); // fills all students and calls display function within
 
     }
-
     }
     return 0;
-    }
+}

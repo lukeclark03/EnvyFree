@@ -140,7 +140,9 @@ struct Classroom {
     void whoCanImprove();
 
     void sitStudent();
+    void sitStudentAt(int row, int col);
     void sitAllStudents(bool debug);
+    void sitAllStudentsNash();
     void reCalcDistances(int row_num);
     void reCalcPayoffs(int row_num);
     void printDistances();
