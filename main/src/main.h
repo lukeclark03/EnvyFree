@@ -149,7 +149,8 @@ struct Classroom {
     void moveStudent(int ID);
     bool canImprove(int ID);
     bool bestResponse();
-    void iteratedBestResponse();
+    int iteratedBestResponse();
+    std::vector<int> getStudentUtilities();
 
 };
 

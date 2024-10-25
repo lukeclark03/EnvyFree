@@ -112,6 +112,16 @@ Classroom::~Classroom(){
     }
 }
 
+vector<int> Classroom::getStudentUtilities(){
+        vector<int> utilities(4);
+
+        for(auto student : students){
+            utilities[student->payoff]++;
+        }
+
+        return utilities;
+    }
+
 
 void Classroom::sitAllStudents(bool debug){
     // this function seats all the students in the classroom, one at a time, with or without debugging
@@ -647,14 +657,19 @@ bool Classroom::bestResponse(){
     return false;
 }
 
-void Classroom::iteratedBestResponse(){
+int Classroom::iteratedBestResponse(){ // changed to return how many times bestResponse moved a student instead of void
     // This function runs iterations of bestResponse until there is no valid move for a student
     cout << "STARTING BEST RESPONSE ##############################################################" << endl;
+    int i = 0;
+
     while(bestResponse()){
+        i++;
         printClassroom();
         printStudents();
     }
-    cout << "BEST RESPONSE TERMINATED. NASH EQUILIBRIUM FOUND"<< endl;
+    cout << "BEST RESPONSE TERMINATED\n\n\n\n"<< endl;
+
+    return i; 
 }
 
 
@@ -768,6 +783,74 @@ void Classroom::printStudents(){
 }
 
 int main(){
+    int choice;
+    cout << "Options: " << endl;
+    cout << "1. Aggregate test: 1000 cases" << endl;
+    cout << "2. Single test" << endl;
+    cin >>  choice;
+
+    if(choice == 1){
+
+        int num_seats = 20;
+        int num_rows = 1;
+        int fullness = 3;
+        int utility = 3;
+
+        int iterations;
+
+        // Take in seats, students, rows
+        cout << "Number of Seats: ";
+        cin >> num_seats;
+        cout << "Number of Students: ";
+        cin >> fullness;
+        cout << "Number of Rows: ";
+        cin >> num_rows;
+        cout << "Utility Threshold: ";
+        cin >> utility;
+        cout << "Number of Iterations: ";
+        cin >> iterations;
+
+        double average_utility = 0.0;
+        double average;
+
+        vector<int> seat_changes;
+        double avg_number_of_moves;
+
+        vector<vector<int>> utilities; // each entry in this is the utility of all students from an individual game. utilities[0][2] is the count/number of students in game #0 with utility 2
+
+        for(int i = 0; i < iterations; i++){
+
+            Classroom room(num_seats, num_rows, fullness, utility);
+            // room.printStudents();
+            room.sitAllStudents(false);
+            seat_changes.push_back(room.iteratedBestResponse());
+            avg_number_of_moves += seat_changes[i];
+
+            utilities.push_back(room.getStudentUtilities());
+        }
+
+        // utilities now contains all student utilities for all games
+
+        for(vector<int> game : utilities){
+            average = 0;
+            double number_of_players = std::accumulate(game.begin(), game.end(), 0.0);
+            int total_utility = game[1] + game[2] * 2 + game[3] * 3;
+            average = total_utility / number_of_players;
+            average_utility += average;
+        }
+
+        average_utility /= iterations;
+        avg_number_of_moves /= iterations;
+
+        cout << "Number of Iterations: " << iterations << endl;
+        cout << "Average Utility: " << average_utility << endl;
+        cout << "Average Number of Moves: " << avg_number_of_moves << endl;
+
+
+    }
+
+    else if(choice == 2){
+
     bool test_list = false;
     if (test_list) {
 
@@ -817,6 +900,8 @@ int main(){
         // vector<Student> students = initStudents(num_seats / fullness , num_greedy);
 
         // Class.rows = fillrows(num_seats / fullness); // fills all students and calls display function within
+
+    }
 
     }
     return 0;
