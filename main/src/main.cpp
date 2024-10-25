@@ -102,7 +102,7 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_,int util_){
         Student* new_student = new Student(-1, i, false, -1, max_utility);  
         students.push_back(new_student);
     }
-    printStudents();
+    // printStudents();
 
 }
 
@@ -156,15 +156,15 @@ void Classroom::sitStudent(){
     // get a random row
     int rand_row = randgen_row(twister);
 
-    cout << "Random Row: " << rand_row << endl;
+    // cout << "Random Row: " << rand_row << endl;
     // get a random column
     int rand_col = randgen_col(twister);
 
-    cout << "Random col: " << rand_col << endl;
+    // cout << "Random col: " << rand_col << endl;
 
     // cout << "sitting student randomly at row " << rand_row << "and col: " << rand_col << endl;
     // add the student to that spot
-    toSit->printStudent();
+    // toSit->printStudent();
     layout[rand_row][rand_col].push_back(toSit);
 
     // recalculate the distances and payoffs for the row the student sat in
@@ -654,7 +654,7 @@ void Classroom::iteratedBestResponse(){
         printClassroom();
         printStudents();
     }
-    cout << "BEST RESPONSE TERMINATED"<< endl;
+    cout << "BEST RESPONSE TERMINATED. NASH EQUILIBRIUM FOUND"<< endl;
 }
 
 
@@ -752,7 +752,8 @@ void Classroom::printClassroom(){
     //     }
     //     cout << "\n";
     // }
-    cout << "DISTANCES" << endl;
+    cout << endl;
+    cout << "DISTANCES (UTILS): MAX UTIL =" <<max_utility << endl;
     printDistances();
     cout << "\n";
     cout << "------------------------------------------------\n\n";
@@ -809,7 +810,9 @@ int main(){
         // Create classroom and seat students
         Classroom room(input_seats, input_rows, input_students, input_maxutil);
         cout << "Created Classroom. Seating all students" << endl;
-        room.sitAllStudents(true);
+        room.sitAllStudents(false);
+        room.printClassroom();
+        room.iteratedBestResponse();
 
         // vector<Student> students = initStudents(num_seats / fullness , num_greedy);
 

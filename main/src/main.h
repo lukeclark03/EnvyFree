@@ -43,11 +43,11 @@ struct Student {
         //     std::cout << "is ungreedy, ";
         // }
         if (payoff == -1){
-            std::cout << "and has no payoff\n";
+            std::cout << "and has no payoff";
         } else {
-            std::cout << "and has payoff: " << payoff << "\n";
+            std::cout << "and has payoff: " << payoff << std::endl;
             // Implemented per student if we want to include personal space as a factor, for example
-            std::cout << "and has preferred maximum utility: " << max_utility << "\n";  
+            // std::cout << "and has preferred maximum utility: " << max_utility << "\n";  
         }
     }
 
