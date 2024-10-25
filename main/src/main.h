@@ -5,6 +5,8 @@
 #include <set>
 #include <algorithm>
 
+
+
 template<typename T>
 using matrix2D = std::vector<std::vector<T>>;
 
@@ -12,8 +14,6 @@ using coordinates = std::pair<int, int>;
 using indexed_set_container = std::vector<std::set<coordinates>>;
 
 struct Student {
-    // true for greedy, false for not
-    bool greedy;
     // -1 for no preference, 0-row count-1 for a specific preference
     int preferred_row;
     // 0-fullness-1
@@ -26,8 +26,8 @@ struct Student {
     int row = -1;
     int col = -1;
 
-    Student(int greedy, int preferred_row, int ID, bool sitting, int payoff, int max_utility)
-        : greedy(greedy), preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff), max_utility(max_utility) {};
+    Student( int preferred_row, int ID, bool sitting, int payoff, int max_utility)
+        :preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff), max_utility(max_utility) {};
     void printStudent(){
         std::cout<< "Student ";
         if (ID < 10){std::cout << "0";}
@@ -124,7 +124,6 @@ struct Classroom {
     int col_count;
     int fullness;
     int number_sat;
-    bool naive;
     int max_utility;
 
     matrix2D<int> rows;
@@ -134,7 +133,7 @@ struct Classroom {
     //indexed_set_container rows_mapped_by_payoff; //unused for now
     // std::vector<int> payoffs;
 
-    Classroom(int seat_num, int row_count, int fullness, bool naive_, int max_util) ;
+    Classroom(int seat_num, int row_count, int fullness, int max_util) ;
     ~Classroom();
     void printClassroom();
     void printStudents();
