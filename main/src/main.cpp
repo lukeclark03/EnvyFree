@@ -267,7 +267,7 @@ void Classroom::sitStudent(){
 
     // get the current student who needs to sit
     Student* toSit = students[number_sat];
-    cout << "sitting a student: " << toSit->ID << endl;
+    // cout << "sitting a student: " << toSit->ID << endl;
     
     std::mt19937_64 twister(
         (mt19937_64::result_type)
@@ -744,7 +744,7 @@ bool Classroom::bestResponse(){
             if (canImprove(i)){
                 // student i can improve, so we move them and return
                 moveStudent(i);
-                cout << "BEST RESPONSE: MOVED STUDENT: " << i << endl;
+                // cout << "BEST RESPONSE: MOVED STUDENT: " << i << endl;
                 return true;
             }
             // no else statement: if that student can't move we ignore them
@@ -760,7 +760,7 @@ bool Classroom::bestResponse(){
             if (canImprove(i)){
                 // student i can improve, so we move them and return
                 moveStudent(i);
-                cout << "BEST RESPONSE (EDGE MOVE): MOVED STUDENT: " << i << endl;
+                // cout << "BEST RESPONSE (EDGE MOVE): MOVED STUDENT: " << i << endl;
                 return true;
             }
         }
@@ -771,7 +771,7 @@ bool Classroom::bestResponse(){
 
 int Classroom::iteratedBestResponse(){ // changed to return how many times bestResponse moved a student instead of void
     // This function runs iterations of bestResponse until there is no valid move for a student
-    cout << "STARTING BEST RESPONSE ##############################################################" << endl;
+    // cout << "STARTING BEST RESPONSE ##############################################################" << endl;
     int i = 0;
 
     while(bestResponse()){
@@ -779,7 +779,7 @@ int Classroom::iteratedBestResponse(){ // changed to return how many times bestR
         printClassroom();
         printStudents();
     }
-    cout << "BEST RESPONSE TERMINATED\n\n\n\n"<< endl;
+    // cout << "BEST RESPONSE TERMINATED\n\n\n\n"<< endl;
 
     return i; 
 }
@@ -792,16 +792,16 @@ int Classroom::iteratedBestResponse(){ // changed to return how many times bestR
 void Classroom::printDistances(){
     for (int i = 0; i < closest_student_dist.size(); i++){
         for (int j = 0; j < closest_student_dist[i].size(); j++){
-            cout << "__0" << closest_student_dist[i][j] << "__"; 
+            // cout << "__0" << closest_student_dist[i][j] << "__"; 
             // cout << "    ";
             // if (closest_student_dist[i][j] < 10){
             //     cout << "0" << closest_student_dist[i][j];
             // } else {
             //     cout << closest_student_dist[i][j];
             // }
-            cout << "    ";
+            // cout << "    ";
         }
-        cout << "\n";
+        // cout << "\n";
     }
 }
 
@@ -810,12 +810,12 @@ void Classroom::whoCanImprove(){
     for (int i = 0; i < students.size(); i++){
         students[i]->printStudent();
         if (canImprove(i)){
-            cout << "above can improve"<< endl;
+            // cout << "above can improve"<< endl;
         } else {
-            cout << "above cannot improve" << endl;
+            // cout << "above cannot improve" << endl;
         }
     }
-    cout << endl;
+    // cout << endl;
 }
 
 
@@ -823,11 +823,11 @@ void Classroom::whoCanImprove(){
 
 void Classroom::printClassroom(){
     if (rows.empty()){
-        cout << "CANNOT PRINT AN EMPTY CLASSROOM \n";
+        // cout << "CANNOT PRINT AN EMPTY CLASSROOM \n";
         return;
     }
-    cout << "PRINTING CLASSROOM----------------------------------------- \n";
-    cout << "SEATS\n";
+    // cout << "PRINTING CLASSROOM----------------------------------------- \n";
+    // cout << "SEATS\n";
     // for (int i = 0; i < rows.size(); i++){
     //     for (int j = 0; j < rows[i].size(); j++){
     //         if (rows[i][j] == -1){
@@ -847,15 +847,15 @@ void Classroom::printClassroom(){
             // now we are printing a specific seat
 
             for (int k = 0; k < layout[i][j].size(); k++){
-                cout << layout[i][j][k]->ID << ",";
+                // cout << layout[i][j][k]->ID << ",";
             }
             for (int k = layout[i][j].size(); k < 3; k++){
-                cout << "__";
+                // cout << "__";
             }
-            cout << "    ";
+            // cout << "    ";
 
         }
-        cout << endl;
+        // cout << endl;
     }
 
 
@@ -879,19 +879,19 @@ void Classroom::printClassroom(){
     //     }
     //     cout << "\n";
     // }
-    cout << endl;
-    cout << "DISTANCES (UTILS): MAX UTIL =" <<max_utility << endl;
+    // cout << endl;
+    // cout << "DISTANCES (UTILS): MAX UTIL =" <<max_utility << endl;
     printDistances();
-    cout << "\n";
-    cout << "------------------------------------------------\n\n";
+    // cout << "\n";
+    // cout << "------------------------------------------------\n\n";
 }
 
 void Classroom::printStudents(){
-    cout << "Printing List of Students: \n";
+    // cout << "Printing List of Students: \n";
     for (int i = 0; i < students.size(); i++){
         students[i]->printStudent();
     }
-    cout << endl;
+    // cout << endl;
 }
 
 int main(){
@@ -905,7 +905,7 @@ int main(){
 
         int num_seats = 20;
         int num_rows = 1;
-        int fullness = 3;
+        double fullness = 3;
         int utility = 3;
 
         int iterations;
@@ -924,6 +924,8 @@ int main(){
         double average_utility = 0.0;
         double average;
 
+        double standard_deviation;
+
         vector<int> seat_changes;
         double avg_number_of_moves;
 
@@ -940,14 +942,37 @@ int main(){
             utilities.push_back(room.getStudentUtilities());
         }
 
+        vector<double> deviations;
+
         // utilities now contains all student utilities for all games
 
         for(vector<int> game : utilities){
+            // calculate stdev first, then other stuff
+            double total_players = 0;
+            double summed_squared_deviation = 0;
+            double std_dev;
+
             average = 0;
-            double number_of_players = std::accumulate(game.begin(), game.end(), 0.0);
+            double number_of_players = accumulate(game.begin(), game.end(), 0.0);
             int total_utility = game[1] + game[2] * 2 + game[3] * 3;
             average = total_utility / number_of_players;
             average_utility += average;
+
+
+            for(int i = 0; i < 4; i++){                    
+                for(int j = game[i]; j > 0; j--){
+                    double ind_deviation = i - average;
+                    double squared_deviation = pow(ind_deviation, 2);
+                    summed_squared_deviation += squared_deviation;
+                    total_players++;
+                }
+            }
+            std_dev = sqrt(summed_squared_deviation / (total_players - 1));
+            deviations.push_back(std_dev);
+        }
+
+        for(int i = 0; i < utilities.size(); i++){
+            standard_deviation += deviations[i];
         }
 
         average_utility /= iterations;
@@ -957,8 +982,24 @@ int main(){
         nash.sitAllStudentsNash();
         int best_nash_turns = nash.iteratedBestResponse();
         vector<int> nash_utility = nash.getStudentUtilities();
-        int total_nash_util = 1 * nash_utility[1] + 2 * nash_utility[2] + 3 * nash_utility[3];
-        int nash_average = total_nash_util / fullness;
+        double total_nash_util = 1 * nash_utility[1] + 2 * nash_utility[2] + 3 * nash_utility[3];
+        double nash_average = total_nash_util / fullness;
+        double optimal_nash_std_dev;
+        
+        double nash_summed_squared_deviation;
+
+        nash.printClassroom();
+
+        for(int i = 0; i < 4; i++){                    
+            for(int j = nash_utility[i]; j > 0; j--){
+                double ind_deviation = i - nash_average;
+                double nash_squared_deviation = pow(ind_deviation, 2); 
+                nash_summed_squared_deviation += nash_squared_deviation;
+            }
+        }
+        optimal_nash_std_dev = sqrt(nash_summed_squared_deviation / (fullness - 1));
+        cout << optimal_nash_std_dev << endl;
+
         cout << "RESULTS --------------------------" << endl;
         cout << "Approximately optimal nash took " << best_nash_turns << " times to reach a Nash" << endl;
         cout << "With average utility of " << average_utility << endl << endl;
@@ -967,6 +1008,8 @@ int main(){
         cout << "Number of Iterations: " << iterations << endl;
         cout << "Average Utility: " << average_utility << endl;
         cout << "Average Number of Moves: " << avg_number_of_moves << endl;
+        cout << "Standard Deviation of Player Utilities: " << standard_deviation / iterations << endl;
+        cout << "Standard Deviation of Optimal Nash Player Utilities: " << optimal_nash_std_dev << endl;
 
 
     }

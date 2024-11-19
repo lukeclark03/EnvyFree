@@ -29,13 +29,13 @@ struct Student {
     Student( int preferred_row, int ID, bool sitting, int payoff, int max_utility)
         :preferred_row(preferred_row), ID(ID), sitting(sitting), payoff(payoff), max_utility(max_utility) {};
     void printStudent(){
-        std::cout<< "Student ";
-        if (ID < 10){std::cout << "0";}
-        std::cout << ID << " ";
+        // std::cout<< "Student ";
+        // if (ID < 10){std::cout << "0";}
+        // std::cout << ID << " ";
         if (sitting){
-            std::cout << "has been sat at row " << row << " and column " << col << ", ";
+            // std::cout << "has been sat at row " << row << " and column " << col << ", ";
         } else {
-            std::cout << "hasn't been sat, ";
+            // std::cout << "hasn't been sat, ";
         }
         // if (greedy){
         //     std::cout << "is  greedy,  ";
@@ -43,9 +43,9 @@ struct Student {
         //     std::cout << "is ungreedy, ";
         // }
         if (payoff == -1){
-            std::cout << "and has no payoff";
+            // std::cout << "and has no payoff";
         } else {
-            std::cout << "and has payoff: " << payoff << std::endl;
+            // std::cout << "and has payoff: " << payoff << std::endl;
             // Implemented per student if we want to include personal space as a factor, for example
             // std::cout << "and has preferred maximum utility: " << max_utility << "\n";  
         }
