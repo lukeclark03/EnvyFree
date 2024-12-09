@@ -3,6 +3,7 @@
 #include <iostream>
 #include <utility>
 #include <set>
+#include <map>
 #include <algorithm>
 
 
@@ -117,6 +118,25 @@ struct Student {
 
 };
 
+struct Coalition{
+    std::set<int> members;
+    std::map<std::set<std::pair<int, int>>,    std::set<std::map<int, std::pair<int, int>>>> repositioning;
+    // repositioning has as its key a set of pairs of ints, where each pair is a position (row, col), and each set is a set of positions such that they are maximal for that coalition
+    // repositioning has as its value a set of maps from ID to new position (pair(row,col)), where each map is a permutation of the players in the positions, and there may be multiple in the set because of disparate payoffs.
+    // if payoffs are equal for some maximal set of positions, then only one permutation is chosen
+    // map(set of seats that one of the best repositionings -> set of permutations for that specific seating)
+    // where a permutation is a map of the ID of a student to the seat it will sit in that permutation.
+    std::map<int, double> expectedPayoffs;
+    // expectedPayoffs are the expected payoffs calculated for all players, with a distribution over the seats and permutations the coalition deems best.
+    // coalitions choose seats based on the highest total payoff.
+
+
+    // std::set<std::pair<,>>
+
+};
+
+
+
 struct Classroom {
 
     int seat_num;
@@ -131,6 +151,7 @@ struct Classroom {
     matrix2D<int> closest_student_dist;
     std:: vector<std::vector<std::vector<Student*>>> layout;
     std::vector<Student*> students;
+    std::set<Coalition> coalitions;
     //indexed_set_container rows_mapped_by_payoff; //unused for now
     // std::vector<int> payoffs;
 
@@ -154,6 +175,11 @@ struct Classroom {
     bool bestResponse();
     int iteratedBestResponse();
     std::vector<int> getStudentUtilities();
+    void placeStudent(int ID, std::pair<int, int> loc);
+    void moveStudents(std::map<int, std::pair<int, int>> newPositions);
+    std::set<std::pair<int, int>> getEmptySeats();
+
+    Coalition createCoalition(std::set<int> IDs);
 
 };
 

@@ -427,7 +427,7 @@ void Classroom::reCalcPayoffs(int row_num){
 
 
 
-// ITERATED BEST RESPONSE CODE BELOW #######################################################################################
+// ITERATED BEST RESPONSE CODE BELOW ########################################################################################################################################
 int Classroom::getUnhappiestStudent(){
     // This function returns the ID of the minimum payoff student
     int min_student = -1;
@@ -443,6 +443,15 @@ int Classroom::getUnhappiestStudent(){
     return min_student;
 }
 
+void Classroom::placeStudent(int ID, pair<int, int> loc){
+    // This function places student with ID at loc.first row and loc.second col (only use after removing them)
+    if (students[ID]->sitting){cout << "cannot place a student that is seating" << endl; throw exception();}
+    students[ID]->row = loc.first;
+    students[ID]->col = loc.second;
+    students[ID]->sitting = true;
+    layout[loc.first][loc.second].push_back(students[ID]);
+
+}
 
 void Classroom::removeStudent(int ID){
     // This function removes student with ID from the layout (and recalculates distances) 
@@ -485,10 +494,7 @@ void Classroom::moveStudent(int ID){
         }
     }
     // now that we have the best seat, we sit the student there.
-    students[ID]->row = best_row;
-    students[ID]->col = best_col;
-    students[ID]->sitting = true;
-    layout[best_row][best_col].push_back(students[ID]);
+    placeStudent(ID, make_pair(best_row, best_col));
     // now we recalculate the distances on that row
     reCalcDistances(best_row);
     reCalcPayoffs(best_row);
@@ -507,10 +513,7 @@ bool Classroom::canImprove(int ID){
     // remove them from prospective new position
     removeStudent(ID);
     // put them back in the old position
-    students[ID]->row = old_row;
-    students[ID]->col = old_col;
-    students[ID]->sitting = true;
-    layout[old_row][old_col].push_back(students[ID]);
+    placeStudent(ID, make_pair(old_row, old_col));
     reCalcDistances(old_row);
     reCalcPayoffs(old_row);
     return toReturn;
@@ -572,6 +575,56 @@ int Classroom::iteratedBestResponse(){ // changed to return how many times bestR
 
     return i; 
 }
+
+
+void Classroom::moveStudents(map<int, pair<int, int>> newPositions){
+    // this function takes in a map for the new positions (values) of some students (keys), and removes them from their current position, and sits them
+    // iterate through each student
+    for (auto i : newPositions){
+        // remove that student
+        removeStudent(i.first);
+        // place that student at the new position
+        placeStudent(i.first, i.second);
+    }
+}
+
+set<pair<int, int>> Classroom::getEmptySeats(){
+    // this function returns a set of all the currently empty seats
+    set<pair<int, int>> empties;
+    for (int i = 0 ; i < row_count; i++){
+        for (int j = 0; j < col_count ; j++){
+            // see if this seat is empty
+            if (layout[i][j].size() == 0){
+                empties.insert(make_pair(i, j));
+            }
+        }
+    }
+    if (print_mode){
+        for (auto x: empties){
+            cout << "row " << x.first << " column " << x.second << " is empty" << endl;
+        }
+    }
+    return empties;
+}
+
+
+
+
+Coalition Classroom::createCoalition(std::set<int> IDs){
+    Coalition c;
+    c.members = IDs;
+    // we get all of the positions map(ID, LOCATION)
+    map<int, pair<int, int>> oldPositions;
+
+    // we first remove all of the students in the coalition from the board
+    for (int oneID : IDs){
+        oldPositions[oneID] = make_pair(students[oneID]->row, students[oneID]->col);
+        removeStudent(oneID);
+    }
+    // now we have a board empty except for those students
+    return c;
+}
+
 
 
 
@@ -811,6 +864,22 @@ int main(){
             cout << "Created Classroom. Seating all students" << endl;
             room.sitAllStudents(true);
             room.iteratedBestResponse();
+
+
+
+
+
+
+
+            // room.getEmptySeats();
+            // cout << "finished" << endl;
+            // map<int, pair<int, int>> newpos;
+            // for (int i = 0; i < 5; i++){
+            //     newpos[i] = make_pair(0,0);
+            // }
+            // room.moveStudents(newpos);
+            // room.printClassroom();
+            // room.getEmptySeats();
 
             // vector<Student> students = initStudents(num_seats / fullness , num_greedy);
 
