@@ -35,6 +35,7 @@ Classroom::Classroom(int seat_num_, int row_count_, int fullness_,int util_, boo
     this->row_count = row_count_;
     this->fullness = fullness_;
     max_utility = util_;
+    print_mode = print_mode_;
 
     // Validity Checks
     if (seat_num % row_count != 0){
@@ -250,7 +251,7 @@ void Classroom::sitAllStudents(bool debug){
             printClassroom();
         }
     }
-    printStudents();
+    if (debug){    printStudents();}
 
 }
 
@@ -284,7 +285,7 @@ void Classroom::sitStudent(){
 
     // cout << "Random col: " << rand_col << endl;
 
-    // cout << "sitting student randomly at row " << rand_row << "and col: " << rand_col << endl;
+    if (print_mode){cout << "sitting student randomly at row " << rand_row << " and col: " << rand_col << endl;}
     // add the student to that spot
     // toSit->printStudent();
     layout[rand_row][rand_col].push_back(toSit);
@@ -744,7 +745,7 @@ bool Classroom::bestResponse(){
             if (canImprove(i)){
                 // student i can improve, so we move them and return
                 moveStudent(i);
-                // cout << "BEST RESPONSE: MOVED STUDENT: " << i << endl;
+                if (print_mode){cout << "BEST RESPONSE: MOVED STUDENT: " << i << endl;}
                 return true;
             }
             // no else statement: if that student can't move we ignore them
@@ -760,7 +761,7 @@ bool Classroom::bestResponse(){
             if (canImprove(i)){
                 // student i can improve, so we move them and return
                 moveStudent(i);
-                // cout << "BEST RESPONSE (EDGE MOVE): MOVED STUDENT: " << i << endl;
+                if(print_mode){cout << "BEST RESPONSE (EDGE MOVE): MOVED STUDENT: " << i << endl;}
                 return true;
             }
         }
@@ -771,15 +772,17 @@ bool Classroom::bestResponse(){
 
 int Classroom::iteratedBestResponse(){ // changed to return how many times bestResponse moved a student instead of void
     // This function runs iterations of bestResponse until there is no valid move for a student
-    // cout << "STARTING BEST RESPONSE ##############################################################" << endl;
+    if (print_mode) {cout << "STARTING BEST RESPONSE ##############################################################" << endl;}
     int i = 0;
 
     while(bestResponse()){
         i++;
-        printClassroom();
-        printStudents();
+        if (print_mode){
+            printClassroom();
+            printStudents();
+        }
     }
-    // cout << "BEST RESPONSE TERMINATED\n\n\n\n"<< endl;
+    if (print_mode) {cout << "BEST RESPONSE TERMINATED\n\n\n\n"<< endl;}
 
     return i; 
 }
@@ -806,16 +809,16 @@ void Classroom::printDistances(){
 }
 
 void Classroom::whoCanImprove(){
-    // cout << "Printing List of Students: \n";
+    cout << "Printing List of Students: \n";
     for (int i = 0; i < students.size(); i++){
         students[i]->printStudent();
         if (canImprove(i)){
-            // cout << "above can improve"<< endl;
+            cout << "above can improve"<< endl;
         } else {
-            // cout << "above cannot improve" << endl;
+            cout << "above cannot improve" << endl;
         }
     }
-    // cout << endl;
+    cout << endl;
 }
 
 
@@ -826,8 +829,8 @@ void Classroom::printClassroom(){
         // cout << "CANNOT PRINT AN EMPTY CLASSROOM \n";
         return;
     }
-    // cout << "PRINTING CLASSROOM----------------------------------------- \n";
-    // cout << "SEATS\n";
+    cout << "PRINTING CLASSROOM----------------------------------------- \n";
+    cout << "SEATS\n";
     // for (int i = 0; i < rows.size(); i++){
     //     for (int j = 0; j < rows[i].size(); j++){
     //         if (rows[i][j] == -1){
@@ -847,15 +850,15 @@ void Classroom::printClassroom(){
             // now we are printing a specific seat
 
             for (int k = 0; k < layout[i][j].size(); k++){
-                // cout << layout[i][j][k]->ID << ",";
+                cout << layout[i][j][k]->ID << ",";
             }
             for (int k = layout[i][j].size(); k < 3; k++){
-                // cout << "__";
+                cout << "__";
             }
-            // cout << "    ";
+            cout << "    ";
 
         }
-        // cout << endl;
+        cout << endl;
     }
 
 
@@ -881,17 +884,17 @@ void Classroom::printClassroom(){
     // }
     // cout << endl;
     // cout << "DISTANCES (UTILS): MAX UTIL =" <<max_utility << endl;
-    printDistances();
+    // printDistances();
     // cout << "\n";
     // cout << "------------------------------------------------\n\n";
 }
 
 void Classroom::printStudents(){
-    // cout << "Printing List of Students: \n";
+    cout << "Printing List of Students: \n";
     for (int i = 0; i < students.size(); i++){
         students[i]->printStudent();
     }
-    // cout << endl;
+    cout << endl;
 }
 
 int main(){
