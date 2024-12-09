@@ -446,6 +446,7 @@ int Classroom::getUnhappiestStudent(){
 void Classroom::placeStudent(int ID, pair<int, int> loc){
     // This function places student with ID at loc.first row and loc.second col (only use after removing them)
     if (students[ID]->sitting){cout << "cannot place a student that is seating" << endl; throw exception();}
+    if (print_mode){cout << "moving student " << ID << " to row " << loc.first << " and col " << loc.second << endl;}
     students[ID]->row = loc.first;
     students[ID]->col = loc.second;
     students[ID]->sitting = true;
@@ -454,7 +455,9 @@ void Classroom::placeStudent(int ID, pair<int, int> loc){
 }
 
 void Classroom::removeStudent(int ID){
-    // This function removes student with ID from the layout (and recalculates distances) 
+    // This function removes student with ID from the layout (and recalculates distances) (you may remove a student that is already removed)
+    // if (!students[ID]->sitting){cout << "cannot remove a student that is not seating" << endl; throw exception();}
+
     // DOES NOT RECALCULATE PAYOFFS
     // first, we get the location of that student
     int row = students[ID]->row;
@@ -581,6 +584,7 @@ void Classroom::moveStudents(map<int, pair<int, int>> newPositions){
     // this function takes in a map for the new positions (values) of some students (keys), and removes them from their current position, and sits them
     // iterate through each student
     for (auto i : newPositions){
+        // if (print_mode){cout << "moving student " << i.first << " to row " <<}
         // remove that student
         removeStudent(i.first);
         // place that student at the new position
@@ -635,7 +639,7 @@ void generateCombinations(vector<pair<int, int>>::iterator current,
 
 
 
-set<set<std::pair<int, int>>> Classroom::getCombinationsOf(set<std::pair<int, int>> empties, int number){
+set<set<pair<int, int>>> Classroom::getCombinationsOf(set<pair<int, int>> empties, int number){
     set<set<pair<int, int>>> result;
 
     // Edge case: If x is greater than the size of the input set, return an empty result
@@ -652,8 +656,6 @@ set<set<std::pair<int, int>>> Classroom::getCombinationsOf(set<std::pair<int, in
     // Start generating combinations
     generateCombinations(pairs.begin(), pairs.end(), number, currentCombination, result);
 
-    
-
     if (print_mode){
         for (const auto& combination : result) {
             cout << "{ ";
@@ -665,25 +667,10 @@ set<set<std::pair<int, int>>> Classroom::getCombinationsOf(set<std::pair<int, in
     }
     
     
-    
-    
-    
-    
     return result;
-
-
-
-
-
 }
 
-
-
-
-
-Coalition Classroom::createCoalition(std::set<int> IDs){
-    Coalition c;
-    c.members = IDs;
+set<set<pair<int, int>>> Classroom::getBestReseating(set<int> IDs){
     // we get all of the positions map(ID, LOCATION)
     map<int, pair<int, int>> oldPositions;
 
@@ -693,6 +680,106 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
         removeStudent(oneID);
     }
     // now we have a board empty except for those students
+    // get all the empty seats
+    set<pair<int, int>> empties = getEmptySeats();
+    // get all the combinations of empty seats for the number of players in the coalition
+    set<set<pair<int, int>>> emptyCombs = getCombinationsOf(empties, IDs.size());
+
+    // first we re-seat players into thier previous seats (they aren't sitting atm)
+    for (auto i : oldPositions){
+        placeStudent(i.first, i.second);
+    }
+
+    // integer to track the total payoff of the players between rounds
+    int max_payoff = 0;
+    // integer to track the current payoff of a combination
+    int current_payoff = 0;
+
+    // set of set of positions that is all the maximal payoff combinations
+    set<set<pair<int, int>>> bestCombinations;
+    // set of rows to update the distances and payoffs of
+    set<int> rowsToUpdate;
+
+    // now we must re-seat the players to a new combination, calculate the total payoff of those players, and see which combination has the highest
+    // for each empty combination, we calculate
+    for(set<pair<int, int>> combination: emptyCombs){
+        // create the map from player IDs to the elements of combination
+        map<int, pair<int, int>> reseatMap;
+        set<pair<int, int>> combination_copy = combination;
+        // go through each ID and add it and one of the empty seats to the map
+        for (int oneID: IDs){
+            reseatMap[oneID] = *combination_copy.begin();
+            rowsToUpdate.insert((*combination_copy.begin()).first);
+            combination_copy.erase(*combination_copy.begin());
+
+        }
+
+        // reseat players in that map
+        moveStudents(reseatMap);
+        if (print_mode){
+        cout << "moved students to empty combination"<< endl; printClassroom();}
+
+        // calculate the payoffs
+
+        // go through each relevant row and update it
+        for (int i : rowsToUpdate){
+            reCalcDistances(i);
+            reCalcPayoffs(i);        
+        } 
+        // compare the total of the payoffs between iterations of for loop. 
+        current_payoff = 0;
+        for (int oneID : IDs){
+            cout << "in this combination, person " << oneID << " gets payoff " << students[oneID]->payoff << endl;
+            current_payoff += students[oneID]->payoff;
+        }
+        // check to see if this is a winning combination
+        if (current_payoff > max_payoff){
+            // flush all of the worse combinations
+            bestCombinations.clear();
+            // add the current combination
+            bestCombinations.insert(combination);
+            // update the max
+            max_payoff = current_payoff;
+        
+        } else if (current_payoff == max_payoff){
+            // add this combination to the list
+            bestCombinations.insert(combination);
+        }
+    }
+
+    // now we move the students back to their old positions
+    moveStudents(oldPositions);
+    return bestCombinations;
+}
+
+
+
+Coalition Classroom::createCoalition(std::set<int> IDs){
+    Coalition c;
+    c.members = IDs;
+
+    set<set<pair<int, int>>> bestReseating = getBestReseating(IDs);
+    if (print_mode){cout << "finished getting best seats. printing orignal classroom " << endl; printClassroom();}
+
+    
+
+    if (print_mode){
+        cout << "the best positions for reseating are: " << endl;
+        for (const auto& combination : bestReseating) {
+            cout << "{ ";
+            for (const auto& pair : combination) {
+                cout << "(" << pair.first << ", " << pair.second << ") ";
+            }
+            cout << "}\n";
+        }
+    }
+
+
+
+
+
+
+
     return c;
 }
 
@@ -942,7 +1029,12 @@ int main(){
 
 
 
-            room.getCombinationsOf(room.getEmptySeats(), 3);
+            // room.getCombinationsOf(room.getEmptySeats(), 3);
+            set<int> testCoalition;
+            testCoalition.insert(0);
+            testCoalition.insert(1);
+            testCoalition.insert(2);
+            room.createCoalition(testCoalition);
 
 
 
