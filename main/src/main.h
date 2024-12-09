@@ -133,7 +133,7 @@ struct Classroom {
     //indexed_set_container rows_mapped_by_payoff; //unused for now
     // std::vector<int> payoffs;
 
-    Classroom(int seat_num, int row_count, int fullness, int max_util) ;
+    Classroom(int seat_num, int row_count, int fullness, int max_util, bool print_mode) ;
     ~Classroom();
     void printClassroom();
     void printStudents();

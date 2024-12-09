@@ -42,12 +42,27 @@ example:
  const std::function<Classroom(parameterlist)> setup = 
     [](parameterlist par) 
     {
-        return Classroom(
-        par.seats, 
-        par.rows, 
-        par.fullness, 
-        par.util
-        );
+        if (par.optional == 1){
+            return Classroom(
+            par.seats, 
+            par.rows, 
+            par.fullness, 
+            par.util,
+            true
+            );
+        }
+        else if (par.optional = 0){
+            return Classroom(
+            par.seats, 
+            par.rows, 
+            par.fullness, 
+            par.util,
+            false
+            );
+        } else {
+            std::cout<<("optional parameter must be 0 or 1 for true/false");
+            throw std::exception();
+        }
     };
 
 

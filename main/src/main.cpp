@@ -28,7 +28,7 @@ void fillrows(int num_students){
 }
 
 
-Classroom::Classroom(int seat_num_, int row_count_, int fullness_,int util_){
+Classroom::Classroom(int seat_num_, int row_count_, int fullness_,int util_, bool print_mode_){
 
     // Initialization of member variables
     this->seat_num = seat_num_;
@@ -933,7 +933,7 @@ int main(){
 
         for(int i = 0; i < iterations; i++){
 
-            Classroom room(num_seats, num_rows, fullness, utility);
+            Classroom room(num_seats, num_rows, fullness, utility, false);
             // room.printStudents();
             room.sitAllStudents(false);
             seat_changes.push_back(room.iteratedBestResponse());
@@ -978,7 +978,7 @@ int main(){
         average_utility /= iterations;
         avg_number_of_moves /= iterations;
 
-        Classroom nash(num_seats, num_rows, fullness, utility);
+        Classroom nash(num_seats, num_rows, fullness, utility, false);
         nash.sitAllStudentsNash();
         int best_nash_turns = nash.iteratedBestResponse();
         vector<int> nash_utility = nash.getStudentUtilities();
@@ -1016,56 +1016,56 @@ int main(){
 
     else if(choice == 2){
 
-    bool test_list = false;
-    if (test_list) {
+        bool test_list = false;
+        if (test_list) {
 
-    parammap test_params = {
-        /*{Index, {seats, rows, fullness, util, optional} }*/
-        {0, {40,2,3,3}},
-        /*{1,{40,2,3,3, 2}},
-        {2, {40, 2, 10, 3}},
-        {3,{10,1,3,3}},
-        {4,{10,1,3,3}},
-        {5,{5,1,3,3}},*/
-    };
+        parammap test_params = {
+            /*{Index, {seats, rows, fullness, util, optional} }*/
+            {0, {40,2,3,3, 1}},
+            /*{1,{40,2,3,3, 2}},
+            {2, {40, 2, 10, 3}},
+            {3,{10,1,3,3}},
+            {4,{10,1,3,3}},
+            {5,{5,1,3,3}},*/
+        };
 
-    runTests(test_params,
-    exampletestlist);
+        runTests(test_params,
+        exampletestlist);
 
-    } else {
+        } else {
 
-        // Variables for the user to fill
-        int input_students;
-        int input_seats;
-        int input_rows;
-        int input_maxutil;
+            // Variables for the user to fill
+            int input_students;
+            int input_seats;
+            int input_rows;
+            int input_maxutil;
 
 
-        // Take in seats, students, rows
-        cout << "Number of Seats: ";
-        cin >> input_seats;
-        cout << "Number of Students: ";
-        cin >>input_students;
-        cout << "Number of Rows: ";
-        cin >>input_rows;
+            // Take in seats, students, rows
+            cout << "Number of Seats: ";
+            cin >> input_seats;
+            cout << "Number of Students: ";
+            cin >>input_students;
+            cout << "Number of Rows: ";
+            cin >>input_rows;
 
-        // Take in a maximum utility
-        cout << "Chose maximum utility for all students: ";
-        cin >> input_maxutil;
-        if (input_maxutil < 1)
-            throw invalid_argument("Must be a positive number");
+            // Take in a maximum utility
+            cout << "Chose maximum utility for all students: ";
+            cin >> input_maxutil;
+            if (input_maxutil < 1)
+                throw invalid_argument("Must be a positive number");
 
-        // Create classroom and seat students
-        Classroom room(input_seats, input_rows, input_students, input_maxutil);
-        cout << "Created Classroom. Seating all students" << endl;
-        room.sitAllStudents(true);
-        room.iteratedBestResponse();
+            // Create classroom and seat students
+            Classroom room(input_seats, input_rows, input_students, input_maxutil, true);
+            cout << "Created Classroom. Seating all students" << endl;
+            room.sitAllStudents(true);
+            room.iteratedBestResponse();
 
-        // vector<Student> students = initStudents(num_seats / fullness , num_greedy);
+            // vector<Student> students = initStudents(num_seats / fullness , num_greedy);
 
-        // Class.rows = fillrows(num_seats / fullness); // fills all students and calls display function within
+            // Class.rows = fillrows(num_seats / fullness); // fills all students and calls display function within
 
-    }
+        }
     }
     return 0;
 }
