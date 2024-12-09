@@ -616,6 +616,7 @@ void generateCombinations(vector<pair<int, int>>::iterator current,
                           int x, 
                           set<pair<int, int>>& currentCombination, 
                           set<set<pair<int, int>>>& result) {
+    // This function is a helper function for getCombinationsOf for recursion
     // Base case: If the current combination size is equal to x, add it to the result
     if (currentCombination.size() == x) {
         result.insert(currentCombination);
@@ -640,6 +641,7 @@ void generateCombinations(vector<pair<int, int>>::iterator current,
 
 
 set<set<pair<int, int>>> Classroom::getCombinationsOf(set<pair<int, int>> empties, int number){
+    // this function returns all combinations of number pairs in empties
     set<set<pair<int, int>>> result;
 
     // Edge case: If x is greater than the size of the input set, return an empty result
@@ -670,7 +672,24 @@ set<set<pair<int, int>>> Classroom::getCombinationsOf(set<pair<int, int>> emptie
     return result;
 }
 
-set<set<pair<int, int>>> Classroom::getBestReseating(set<int> IDs){
+map<int, pair<int, int>> Classroom::makeReseatMap(set<int> IDs, set<pair<int, int>> locations){
+    // This function takes in a set of IDs and a set of locations, and outputs a map that can be used to reseat those students to those locations
+    // does not consider order of students, seats a not neccessarily random permutation
+    map<int, pair<int, int>> reseatMap;
+    set<pair<int, int>> combination_copy = locations;
+    // go through each ID and add it and one of the seats to the map
+    for (int oneID: IDs){
+        reseatMap[oneID] = *combination_copy.begin();
+        combination_copy.erase(*combination_copy.begin());
+    }
+    return reseatMap;
+}
+
+
+
+
+
+pair<set<set<pair<int, int>>>, int> Classroom::getBestReseating(set<int> IDs){
     // we get all of the positions map(ID, LOCATION)
     map<int, pair<int, int>> oldPositions;
 
@@ -716,8 +735,7 @@ set<set<pair<int, int>>> Classroom::getBestReseating(set<int> IDs){
 
         // reseat players in that map
         moveStudents(reseatMap);
-        if (print_mode){
-        cout << "moved students to empty combination"<< endl; printClassroom();}
+        // if (print_mode){cout << "moved students to empty combination"<< endl; printClassroom();}
 
         // calculate the payoffs
 
@@ -729,7 +747,7 @@ set<set<pair<int, int>>> Classroom::getBestReseating(set<int> IDs){
         // compare the total of the payoffs between iterations of for loop. 
         current_payoff = 0;
         for (int oneID : IDs){
-            cout << "in this combination, person " << oneID << " gets payoff " << students[oneID]->payoff << endl;
+            // cout << "in this combination, person " << oneID << " gets payoff " << students[oneID]->payoff << endl;
             current_payoff += students[oneID]->payoff;
         }
         // check to see if this is a winning combination
@@ -749,7 +767,7 @@ set<set<pair<int, int>>> Classroom::getBestReseating(set<int> IDs){
 
     // now we move the students back to their old positions
     moveStudents(oldPositions);
-    return bestCombinations;
+    return make_pair(bestCombinations, max_payoff);
 }
 
 
@@ -758,7 +776,10 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
     Coalition c;
     c.members = IDs;
 
-    set<set<pair<int, int>>> bestReseating = getBestReseating(IDs);
+    pair<set<set<pair<int, int>>>, int> temp = getBestReseating(IDs);
+    set<set<pair<int, int>>> bestReseating = temp.first;
+    int total_coalition_payoff = temp.second;
+
     if (print_mode){cout << "finished getting best seats. printing orignal classroom " << endl; printClassroom();}
 
     
@@ -772,6 +793,30 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
             }
             cout << "}\n";
         }
+    }
+    // for each combination in bestReseating
+        // reseat members of coalition to those spots,
+        // calculate the payoffs
+        // make a map of ID -> payoff for each student
+        // replace payoff of each coalition member with average of coalition members payoff
+
+    // for each combination in bestReseating
+    for (set<pair<int, int>> combination: bestReseating){
+        // reseat members of coalition to those spots
+        moveStudents(makeReseatMap(IDs, combination));
+
+        // calculate the payoffs
+        for (int i = 0; i < row_count; i ++){
+            reCalcDistances(i);
+            reCalcPayoffs(i);
+        }
+        // make a map of ID -> payoff for each student
+        map<int, double> payoffMap;
+        for (auto student : students){
+            payoffMap[student->ID] = (double) student->payoff;
+        }
+        // replace payoff of each coalition member with average of coalition members payoff
+
     }
 
 

@@ -178,7 +178,8 @@ struct Classroom {
     void placeStudent(int ID, std::pair<int, int> loc);
     void moveStudents(std::map<int, std::pair<int, int>> newPositions);
     std::set<std::pair<int, int>> getEmptySeats();
-    std::set<std::set<std::pair<int, int>>> getBestReseating(std::set<int> IDs);
+    std::pair<std::set<std::set<std::pair<int, int>>>, int> getBestReseating(std::set<int> IDs);
+    std::map<int, std::pair<int, int>> makeReseatMap(std::set<int> IDs, std::set<std::pair<int, int>> locations);
 
     std::set<std::set<std::pair<int, int>>> getCombinationsOf(std::set<std::pair<int, int>> empties_, int number_);
 
