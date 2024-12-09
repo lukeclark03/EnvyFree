@@ -607,6 +607,77 @@ set<pair<int, int>> Classroom::getEmptySeats(){
     return empties;
 }
 
+void generateCombinations(vector<pair<int, int>>::iterator current, 
+                          vector<pair<int, int>>::iterator end,
+                          int x, 
+                          set<pair<int, int>>& currentCombination, 
+                          set<set<pair<int, int>>>& result) {
+    // Base case: If the current combination size is equal to x, add it to the result
+    if (currentCombination.size() == x) {
+        result.insert(currentCombination);
+        return;
+    }
+    
+    // Stop if we've exhausted the input set
+    if (current == end) {
+        return;
+    }
+
+    // Include the current pair in the combination
+    currentCombination.insert(*current);
+    generateCombinations(next(current), end, x, currentCombination, result);
+
+    // Exclude the current pair and proceed to the next
+    currentCombination.erase(*current);
+    generateCombinations(next(current), end, x, currentCombination, result);
+}
+
+
+
+
+set<set<std::pair<int, int>>> Classroom::getCombinationsOf(set<std::pair<int, int>> empties, int number){
+    set<set<pair<int, int>>> result;
+
+    // Edge case: If x is greater than the size of the input set, return an empty result
+    if (number > empties.size() || number <= 0) {
+        return result;
+    }
+
+    // Convert the input set to a vector for easier iteration
+    vector<pair<int, int>> pairs(empties.begin(), empties.end());
+    
+    // Temporary set to hold the current combination
+    set<pair<int, int>> currentCombination;
+
+    // Start generating combinations
+    generateCombinations(pairs.begin(), pairs.end(), number, currentCombination, result);
+
+    
+
+    if (print_mode){
+        for (const auto& combination : result) {
+            cout << "{ ";
+            for (const auto& pair : combination) {
+                cout << "(" << pair.first << ", " << pair.second << ") ";
+            }
+            cout << "}\n";
+        }
+    }
+    
+    
+    
+    
+    
+    
+    return result;
+
+
+
+
+
+}
+
+
 
 
 
@@ -871,7 +942,11 @@ int main(){
 
 
 
-            // room.getEmptySeats();
+            room.getCombinationsOf(room.getEmptySeats(), 3);
+
+
+
+
             // cout << "finished" << endl;
             // map<int, pair<int, int>> newpos;
             // for (int i = 0; i < 5; i++){
