@@ -135,9 +135,15 @@ struct Coalition{
 
 struct Partition{
 
-    Partition(std::set<Coalition> coalitions) : coalitions(coalitions) {}
+    Partition(std::set<Coalition> coalitions) : coalitions(coalitions) {
+        numStudents = (*coalitions.begin()).expectedPayoffs.size();
+
+        calculateExpectedPayoffs(coalitions);
+
+    }
 
     std::set<Coalition> coalitions;
+    int numStudents;
     std::map<int, double> studentExpectedPayoffs;
 
     std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);

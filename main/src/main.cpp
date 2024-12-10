@@ -10,10 +10,30 @@ using namespace std;
 
 std::map<int, double> Partition::calculateExpectedPayoffs(std::set<Coalition> coalitions){
 
+    // // set finalpayoff map to 0
+    // for (int i = 0; i < students.size(); i++){
+    //     finalPayoffMap[i] = 0;
+    // }
+    // // add each divided by the number of contributing repositionings
+
+    // for (auto reposition : repositions){
+    //     for (int i = 0; i < students.size(); i++){
+    //         // add the contributing payoff to the final payoff map
+    //         finalPayoffMap[i] += reposition.second[i] / repositions.size();
+    //     }
+    // }
+
+    // c.expectedPayoffs = finalPayoffMap;
+
+    for(int i = 0; i < numStudents; i++){
+        studentExpectedPayoffs[i] = 0;
+    }
+
     for(auto coalition : coalitions){
-
-
-
+        for(int i = 0; i < numStudents; i++){
+        
+            studentExpectedPayoffs[i] += coalition.expectedPayoffs[i] * (double(coalition.members.size()) / double(numStudents));
+        }
     }
 
 }
