@@ -136,6 +136,17 @@ struct Coalition{
 };
 
 
+struct Partition{
+
+    Partition(std::set<Coalition> coalitions) : coalitions(coalitions) {}
+
+    std::set<Coalition> coalitions;
+    std::map<int, double> studentExpectedPayoffs;
+
+    std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
+
+};
+
 
 struct Classroom {
 
@@ -149,7 +160,7 @@ struct Classroom {
 
     matrix2D<int> rows;
     matrix2D<int> closest_student_dist;
-    std:: vector<std::vector<std::vector<Student*>>> layout;
+    std::vector<std::vector<std::vector<Student*>>> layout;
     std::vector<Student*> students;
     std::set<Coalition> coalitions;
     //indexed_set_container rows_mapped_by_payoff; //unused for now

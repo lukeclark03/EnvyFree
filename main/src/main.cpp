@@ -8,6 +8,16 @@
 using namespace std;
 
 
+std::map<int, double> Partition::calculateExpectedPayoffs(std::set<Coalition> coalitions){
+
+    for(auto coalition : coalitions){
+
+
+
+    }
+
+}
+
 vector<Student> initStudents(int num_students, int num_greedy){
     vector<Student> students;
 
