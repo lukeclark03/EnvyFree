@@ -2,6 +2,8 @@
 *.out
 *.pch
 *.json
+*.exe
+input.txt
 .obsidian
 .clang-format
 .clang-tidy

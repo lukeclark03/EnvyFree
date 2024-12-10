@@ -728,6 +728,12 @@ pair<set<set<pair<int, int>>>, int> Classroom::getBestReseating(set<int> IDs){
     int max_payoff = 0;
     // integer to track the current payoff of a combination
     int current_payoff = 0;
+    //integer to track the highest paid member
+    int max_individual_payoff = 0;
+    // integer to track the lowest paid member
+    int min_individual_payoff = 0;
+    // integer to track the difference 
+    int min_max_diff = 3;
 
     // set of set of positions that is all the maximal payoff combinations
     set<set<pair<int, int>>> bestCombinations;
@@ -761,9 +767,14 @@ pair<set<set<pair<int, int>>>, int> Classroom::getBestReseating(set<int> IDs){
         } 
         // compare the total of the payoffs between iterations of for loop. 
         current_payoff = 0;
+        max_individual_payoff = 0;
+        min_individual_payoff = max_utility;
+
         for (int oneID : IDs){
             // cout << "in this combination, person " << oneID << " gets payoff " << students[oneID]->payoff << endl;
             current_payoff += students[oneID]->payoff;
+            max_individual_payoff = max(max_individual_payoff, students[oneID]->payoff);
+            min_individual_payoff = min(min_individual_payoff, students[oneID]->payoff);
         }
         // check to see if this is a winning combination
         if (current_payoff > max_payoff){
@@ -773,10 +784,24 @@ pair<set<set<pair<int, int>>>, int> Classroom::getBestReseating(set<int> IDs){
             bestCombinations.insert(combination);
             // update the max
             max_payoff = current_payoff;
+            min_max_diff = max_individual_payoff - min_individual_payoff;
         
         } else if (current_payoff == max_payoff){
             // add this combination to the list
-            bestCombinations.insert(combination);
+            if (max_individual_payoff - min_individual_payoff < min_max_diff){
+                // we have a more fair solution that has the same total payoff, we prefer this
+                            // flush all of the worse combinations
+                bestCombinations.clear();
+                // add the current combination
+                bestCombinations.insert(combination);
+                // update the max
+                max_payoff = current_payoff;
+                min_max_diff = max_individual_payoff - min_individual_payoff;
+            } else if (max_individual_payoff - min_individual_payoff == min_max_diff){
+                // we have an equally fair solution. we add it to the list
+                bestCombinations.insert(combination);
+            } 
+            // if neither of those hit, then there is a equal payoff solution that is less equitable than the current, so we ignore it.
         }
     }
 
