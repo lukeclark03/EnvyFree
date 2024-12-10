@@ -120,12 +120,9 @@ struct Student {
 
 struct Coalition{
     std::set<int> members;
-    std::map<std::set<std::pair<int, int>>,    std::set<std::map<int, std::pair<int, int>>>> repositioning;
-    // repositioning has as its key a set of pairs of ints, where each pair is a position (row, col), and each set is a set of positions such that they are maximal for that coalition
-    // repositioning has as its value a set of maps from ID to new position (pair(row,col)), where each map is a permutation of the players in the positions, and there may be multiple in the set because of disparate payoffs.
-    // if payoffs are equal for some maximal set of positions, then only one permutation is chosen
-    // map(set of seats that one of the best repositionings -> set of permutations for that specific seating)
-    // where a permutation is a map of the ID of a student to the seat it will sit in that permutation.
+    // members is the set of members in the coalition
+    std::map<std::set<std::pair<int, int>>, std::map<int, double>> repositioning;
+    // repositioning is a map, with key being a set of locations that are a maximal reseating for this coalition, and values being the payoff map from student IDs to payoffs, which may be decimal because there is a random permutation chosen: ie all players in the coalition receive the same payoff.
     std::map<int, double> expectedPayoffs;
     // expectedPayoffs are the expected payoffs calculated for all players, with a distribution over the seats and permutations the coalition deems best.
     // coalitions choose seats based on the highest total payoff.
