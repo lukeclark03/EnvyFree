@@ -1093,6 +1093,82 @@ set<set<set<int>>> allPartitions(vector<int> sete)
 
 
 
+void Classroom::createParitions(){
+    // this function populates the round with the partitions;
+    // TODO: delete information properly to avoid memory leaks
+    round.coalitionMap.clear();
+    round.Partitions.clear();
+
+    vector<int> everyPlayer(fullness);
+    for (int i = 0; i < fullness; i++) {
+        everyPlayer[i] = i;
+    }
+
+    set<set<set<int>>> allSetPartitions = allPartitions(everyPlayer);
+
+    for (auto partition : allSetPartitions){
+        // we are now considering a single partition 
+        set<Coalition> partitionConstructorInput;
+
+        // we check to see that each coalition is in the map so its calculations can be formed.
+        for (auto coalition : partition){
+            if (round.coalitionMap.find(coalition) == round.coalitionMap.end()){
+                // we are missing a coalition, we compute it and add it
+                addToCoalitionMap(coalition);
+            }
+            partitionConstructorInput.insert(round.coalitionMap[coalition]);
+        }
+
+        // now each of the coalitions is gauranteed to be formed, so we get all of them and then put them into the partition constructor
+        Partition* p = new Partition(partitionConstructorInput);
+        round.Partitions.push_back(p);
+    }
+
+}
+void Classroom::addToCoalitionMap(set<int> IDs){
+    // This function creates the coalition with the IDs, and adds it to the coalition map so that it can be used to create partitions.
+    Coalition c = createCoalition(IDs);
+    round.coalitionMap[IDs] = c;
+}
+
+
+void Classroom::printPartitions(){
+    int i = 0;
+    for (Partition* p : round.Partitions){
+        cout << "Partition " << i << " :" << endl;
+        p->printParition();
+        i++;
+    }
+    cout << "there are " << round.coalitionMap.size() << " many coalitions in our set" << endl;
+}
+
+void Classroom::fillAdjacencies(){
+    // this function fills the adjacencies of every partition in the round
+    // first we clear them in case there are strange nonempty ones
+    for (Partition* p : round.Partitions){
+
+    }
+
+
+}
+
+set<set<int>> Classroom::breakPartition(set<set<int>> OrigPartition, set<int> defectors){
+    set<set<int>> newPartition = OrigPartition;
+    for (auto coalition : newPartition){
+        // we consider each coalition within the partition, and remove any and all defectors from it
+        for (int defector : defectors){
+            coalition.erase(defector);
+        }
+        // we see if there are any members left in the coalition, we remove from the partition if not
+        if (coalition.size() == 0) {
+            newPartition.erase(coalition);
+        }
+    }
+    // we add the defector coalition back into the partition
+    newPartition.insert(defectors);
+    // this is the new partition that we wanted, we return it
+    return newPartition;
+}
 
 
 
@@ -1314,40 +1390,43 @@ int main(){
             
 
 
-            cout << "making a partition" << endl;
+            cout << "making a partition" << endl<< endl<<endl;
             Classroom::Partition myParition = Classroom::Partition(coalitionSet);
-            cout << "parition made" <<  endl;
+            cout << "printing the partition" << endl<< endl<<endl;
             myParition.printParition();
+            room.createParitions();
+            cout << endl<< endl<< endl<< endl<< endl<< endl<< endl<< endl;
+            room.printPartitions();
 
             // Input set
             // Input set
-            set<int> inputSet = {1, 2, 3, 4};
+            // set<int> inputSet = {1, 2, 3, 4};
 
-            // Generate all partitions
-            set<set<set<int>>> all;
+            // // Generate all partitions
+            // set<set<set<int>>> all;
 
-            // Print the result
-            // cout << "All partitions of the set: { ";
-            // for (int elem : inputSet) cout << elem << " ";
-            // cout << "}\n";
+            // // Print the result
+            // // cout << "All partitions of the set: { ";
+            // // for (int elem : inputSet) cout << elem << " ";
+            // // cout << "}\n";
 
-            // printPartitions(allPartitions);
+            // // printPartitions(allPartitions);
 
 
-            // The size of the set
-            int n = 5;
+            // // The size of the set
+            // int n = 5;
         
-            // Initialize the set as
-            // {1, 2, ..., n}
-            vector<int> set(n);
-            for (int i = 0; i < n; i++) {
-                set[i] = i + 1;
-            }
-            cout << "All partition of the set will be : " << endl;
+            // // Initialize the set as
+            // // {1, 2, ..., n}
+            // vector<int> set(n);
+            // for (int i = 0; i < n; i++) {
+            //     set[i] = i + 1;
+            // }
+            // cout << "All partition of the set will be : " << endl;
         
-            // Generate all partitions of the set
-            all = allPartitions(set);
-            printPartitions(all);
+            // // Generate all partitions of the set
+            // all = allPartitions(set);
+            // printPartitions(all);
 
 
 

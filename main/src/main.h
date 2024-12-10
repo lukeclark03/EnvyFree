@@ -147,15 +147,16 @@ struct Classroom {
             numStudents = std::get<2>(*coalitions.begin()).size();
             // std:: cout << numStudents;
             // throw std::exception();
-            std::cout << "seeding expected payoffs map to 0" << std::endl;
+            // std::cout << "seeding expected payoffs map to 0" << std::endl;
             for(int i = 0; i < numStudents; i++){
-                std::cout << "adding " << i << " , 0 to the map" << std::endl;
+                // std::cout << "adding " << i << " , 0 to the map" << std::endl;
                 studentExpectedPayoffs[i] = 0;
             }
 
-            std::cout << "adding the expected payoffs from each coalition" << std::endl;
+            // std::cout << "adding the expected payoffs from each coalition" << std::endl;
             for(Coalition coalition : coalitions){
-                std:: cout << "next coalition" << std::endl;
+                coalition_IDs.insert(std::get<0>(coalition));
+                // std:: cout << "next coalition" << std::endl;
                 for(int i = 0; i < numStudents; i++){
             
                     studentExpectedPayoffs[i] += std::get<2>(coalition)[i] * (double(std::get<0>(coalition).size()) / double(numStudents));
@@ -165,8 +166,10 @@ struct Classroom {
         }
 
         std::set<Coalition> coalitions;
+        std::set<std::set<int>> coalition_IDs;
         int numStudents;
         std::map<int, double> studentExpectedPayoffs;
+        std::set<Partition*> adjacencies;
 
         // std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
         void printParition(){
@@ -191,6 +194,21 @@ struct Classroom {
 
     };
 
+
+    struct Round{
+        // a Round stores the current state of the game, including all possible coalitions and partitions
+        
+        std::map<std::set<int>, Coalition> coalitionMap;
+        // This  is all of the coalitions precalculated to make the parititions quicker
+        std::vector<Partition*> Partitions;
+        // this is all of the partitions of the current game, and they should be linked properly.
+        // int numStudents;
+        // void addToCoalitionMap(std::set<int> IDs);
+        // void createParitions();
+
+
+    };
+
     int seat_num;
     int row_count;
     int col_count;
@@ -204,6 +222,7 @@ struct Classroom {
     std::vector<std::vector<std::vector<Student*>>> layout;
     std::vector<Student*> students;
     std::set<Coalition> coalitions;
+    Round round;
     //indexed_set_container rows_mapped_by_payoff; //unused for now
     // std::vector<int> payoffs;
 
@@ -236,6 +255,12 @@ struct Classroom {
     std::set<std::set<std::pair<int, int>>> getCombinationsOf(std::set<std::pair<int, int>> empties_, int number_);
 
     Coalition createCoalition(std::set<int> IDs);
+
+    void addToCoalitionMap(std::set<int> IDs);
+    void createParitions();
+    void fillAdjacencies();
+    std::set<std::set<int>> breakPartition(std::set<std::set<int>> partition, std::set<int> defectors);
+    void printPartitions();
 
 };
 
