@@ -4,39 +4,24 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <unordered_set>
 
 using namespace std;
 
 
-std::map<int, double> Partition::calculateExpectedPayoffs(std::set<Coalition> coalitions){
+// std::map<int, double> Partition::calculateExpectedPayoffs(std::set<Coalition> coalitions){
 
-    // // set finalpayoff map to 0
-    // for (int i = 0; i < students.size(); i++){
-    //     finalPayoffMap[i] = 0;
-    // }
-    // // add each divided by the number of contributing repositionings
+//     for(int i = 0; i < numStudents; i++){
+//         studentExpectedPayoffs[i] = 0;
+//     }
 
-    // for (auto reposition : repositions){
-    //     for (int i = 0; i < students.size(); i++){
-    //         // add the contributing payoff to the final payoff map
-    //         finalPayoffMap[i] += reposition.second[i] / repositions.size();
-    //     }
-    // }
-
-    // c.expectedPayoffs = finalPayoffMap;
-
-    for(int i = 0; i < numStudents; i++){
-        studentExpectedPayoffs[i] = 0;
-    }
-
-    for(auto coalition : coalitions){
-        for(int i = 0; i < numStudents; i++){
+//     for(auto coalition : coalitions){
+//         for(int i = 0; i < numStudents; i++){
         
-            studentExpectedPayoffs[i] += coalition.expectedPayoffs[i] * (double(coalition.members.size()) / double(numStudents));
-        }
-    }
-
-}
+//             studentExpectedPayoffs[i] += coalition.expectedPayoffs[i] * (double(coalition.members.size()) / double(numStudents));
+//         }
+//     }
+// }
 
 vector<Student> initStudents(int num_students, int num_greedy){
     vector<Student> students;
@@ -635,7 +620,7 @@ set<pair<int, int>> Classroom::getEmptySeats(){
     }
     if (print_mode){
         for (auto x: empties){
-            cout << "row " << x.first << " column " << x.second << " is empty" << endl;
+            // cout << "row " << x.first << " column " << x.second << " is empty" << endl;
         }
     }
     return empties;
@@ -804,11 +789,15 @@ pair<set<set<pair<int, int>>>, int> Classroom::getBestReseating(set<int> IDs){
 
 Coalition Classroom::createCoalition(std::set<int> IDs){
     Coalition c;
-    c.members = IDs;
+    get<0>(c) = IDs;
     map<set<pair<int, int>>, map<int, double>> repositions;
     map<int, double> finalPayoffMap;
 
+    // cout << "classroom before get best reseating--------------------------------------------------------------------" << endl;
+    // printClassroom();
     pair<set<set<pair<int, int>>>, int> temp = getBestReseating(IDs);
+    // cout << "classroom after get best reseating--------------------------------------------------------------------" << endl;
+    // printClassroom();
     set<set<pair<int, int>>> bestReseating = temp.first;
     int total_coalition_payoff = temp.second;
     double individual_coalition_payoff = (double) total_coalition_payoff / (double) IDs.size();
@@ -816,10 +805,14 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
 
     if (print_mode){cout << "finished getting best seats. printing orignal classroom " << endl; printClassroom();}
 
-    
+    // classroom has remained the same
 
     if (print_mode){
-        cout << "the best positions for reseating are: " << endl;
+        cout << "the best positions for reseating Students ";
+        for (int id: IDs){
+            cout << id << " ";
+        }
+        cout << " are: " << endl;
         for (const auto& combination : bestReseating) {
             cout << "{ ";
             for (const auto& pair : combination) {
@@ -833,6 +826,14 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
         // calculate the payoffs
         // make a map of ID -> payoff for each student
         // replace payoff of each coalition member with average of coalition members payoff
+
+
+    // save the positions of the students in question
+    // we get all of the positions map(ID, LOCATION)
+    map<int, pair<int, int>> oldPositions;
+    for (int oneID : IDs){
+        oldPositions[oneID] = make_pair(students[oneID]->row, students[oneID]->col);
+    }
 
     // for each combination in bestReseating
     for (set<pair<int, int>> combination: bestReseating){
@@ -855,16 +856,19 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
         }
 
         if (print_mode){
-            cout << "Payoff map:\n";
+            cout << "Contributing Payoff map:\n";
             for (const auto& pair : payoffMap) {
                 cout << "ID: " << pair.first << ", Payoff: " << pair.second << "\n";
             }
         }
         repositions[combination] = payoffMap;
 
-    }
 
-    c.repositioning = repositions;
+    }
+    // move students to original seats
+    moveStudents(oldPositions);
+    // students will not move from this point onward
+    get<1>(c)= repositions;
 
     // set finalpayoff map to 0
     for (int i = 0; i < students.size(); i++){
@@ -879,20 +883,14 @@ Coalition Classroom::createCoalition(std::set<int> IDs){
         }
     }
 
-    c.expectedPayoffs = finalPayoffMap;
+    get<2>(c) = finalPayoffMap;
 
     if (print_mode){
-        cout << "printing the final payoffs for students under this coalition" << endl;
+        cout << "Final Coalition Payoff Map" << endl;
         for (auto student : finalPayoffMap){
             cout << "Student " << student.first << " may receive payoff of " << student.second << endl;
         }
     }
-
-
-
-
-
-
 
 
     return c;
@@ -1149,8 +1147,29 @@ int main(){
             testCoalition.insert(0);
             testCoalition.insert(1);
             testCoalition.insert(2);
-            room.createCoalition(testCoalition);
+            set<int> testCoalition2;
+            testCoalition2.insert(3);
+            testCoalition2.insert(4);
 
+            set<Coalition> coalitionSet;
+            // Coalition temp = room.createCoalition(testCoalition);
+            // coalitionSet.insert(temp);
+            cout << "making first coalition" << endl;
+            room.printClassroom();
+            coalitionSet.insert(room.createCoalition(testCoalition2));
+            cout << "finished making first coalition" << endl;
+            room.printClassroom();
+            cout << " making second coalition" << endl;
+            coalitionSet.insert(room.createCoalition(testCoalition));
+            cout << "finished making second coalition" << endl;
+            room.printClassroom();
+
+            
+
+
+            cout << "not making a partition" << endl;
+            // Classroom::Partition myParition = Classroom::Partition(coalitionSet);
+            // myParition.printParition();
 
 
 

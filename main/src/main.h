@@ -5,7 +5,7 @@
 #include <set>
 #include <map>
 #include <algorithm>
-
+#include <tuple>
 
 
 template<typename T>
@@ -13,6 +13,8 @@ using matrix2D = std::vector<std::vector<T>>;
 
 using coordinates = std::pair<int, int>;
 using indexed_set_container = std::vector<std::set<coordinates>>;
+using Coalition = std::tuple<std::set<int>, std::map<std::set<std::pair<int, int>>, std::map<int, double>>, std::map<int, double>>;
+// coalition has members, newpositions and corresponding maps, and total coalition map
 
 struct Student {
     // -1 for no preference, 0-row count-1 for a specific preference
@@ -118,40 +120,70 @@ struct Student {
 
 };
 
-struct Coalition{
-    std::set<int> members;
-    // members is the set of members in the coalition
-    std::map<std::set<std::pair<int, int>>, std::map<int, double>> repositioning;
-    // repositioning is a map, with key being a set of locations that are a maximal reseating for this coalition, and values being the payoff map from student IDs to payoffs, which may be decimal because there is a random permutation chosen: ie all players in the coalition receive the same payoff.
-    std::map<int, double> expectedPayoffs;
-    // expectedPayoffs are the expected payoffs calculated for all players, with a distribution over the seats and permutations the coalition deems best.
-    // coalitions choose seats based on the highest total payoff.
 
-
-    // std::set<std::pair<,>>
-
-};
-
-
-struct Partition{
-
-    Partition(std::set<Coalition> coalitions) : coalitions(coalitions) {
-        numStudents = (*coalitions.begin()).expectedPayoffs.size();
-
-        calculateExpectedPayoffs(coalitions);
-
-    }
-
-    std::set<Coalition> coalitions;
-    int numStudents;
-    std::map<int, double> studentExpectedPayoffs;
-
-    std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
-
-};
 
 
 struct Classroom {
+    //     struct Coalition{
+    //     std::set<int> members;
+    //     // members is the set of members in the coalition
+    //     std::map<std::set<std::pair<int, int>>, std::map<int, double>> repositioning;
+    //     // repositioning is a map, with key being a set of locations that are a maximal reseating for this coalition, and values being the payoff map from student IDs to payoffs, which may be decimal because there is a random permutation chosen: ie all players in the coalition receive the same payoff.
+    //     std::map<int, double> expectedPayoffs;
+    //     // expectedPayoffs are the expected payoffs calculated for all players, with a distribution over the seats and permutations the coalition deems best.
+    //     // coalitions choose seats based on the highest total payoff.
+
+
+    //     // std::set<std::pair<,>>
+
+    // };
+
+
+    struct Partition{
+
+        Partition(std::set<Coalition> coalitions_){
+            // setting numbStudents, since the partition is not
+            numStudents = std::get<2>(*coalitions.begin()).size();
+            coalitions = coalitions_;
+            for(int i = 0; i < numStudents; i++){
+                studentExpectedPayoffs[i] = 0;
+            }
+
+            for(Coalition coalition : coalitions){
+                for(int i = 0; i < numStudents; i++){
+                
+                    studentExpectedPayoffs[i] += std::get<2>(coalition)[i] * (double(std::get<0>(coalition).size()) / double(numStudents));
+                }
+            }
+
+        }
+
+        std::set<Coalition> coalitions;
+        int numStudents;
+        std::map<int, double> studentExpectedPayoffs;
+
+        // std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
+        void printParition(){
+            std::cout << "Printing partition below" << std::endl;
+            int i = 0;
+            for (Coalition coalition : coalitions){
+                std::cout << "Coalition " << i <<": ";
+                for(int member : std::get<0>(coalition)){
+                    std::cout << member << "  ";
+                }
+                std::cout << std::endl;
+                i++;
+            }
+
+            std::cout << "Payoff map:\n";
+            for (const auto& pair : studentExpectedPayoffs) {
+                std::cout << "ID: " << pair.first << ", Payoff: " << pair.second << "\n";
+            }
+        }
+            
+        
+
+    };
 
     int seat_num;
     int row_count;
