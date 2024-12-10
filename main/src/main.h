@@ -143,15 +143,21 @@ struct Classroom {
 
         Partition(std::set<Coalition> coalitions_){
             // setting numbStudents, since the partition is not
-            numStudents = std::get<2>(*coalitions.begin()).size();
             coalitions = coalitions_;
+            numStudents = std::get<2>(*coalitions.begin()).size();
+            // std:: cout << numStudents;
+            // throw std::exception();
+            std::cout << "seeding expected payoffs map to 0" << std::endl;
             for(int i = 0; i < numStudents; i++){
+                std::cout << "adding " << i << " , 0 to the map" << std::endl;
                 studentExpectedPayoffs[i] = 0;
             }
 
+            std::cout << "adding the expected payoffs from each coalition" << std::endl;
             for(Coalition coalition : coalitions){
+                std:: cout << "next coalition" << std::endl;
                 for(int i = 0; i < numStudents; i++){
-                
+            
                     studentExpectedPayoffs[i] += std::get<2>(coalition)[i] * (double(std::get<0>(coalition).size()) / double(numStudents));
                 }
             }
@@ -164,7 +170,7 @@ struct Classroom {
 
         // std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
         void printParition(){
-            std::cout << "Printing partition below" << std::endl;
+            std::cout << "Printing partition below, "<< numStudents << " students" << std::endl;
             int i = 0;
             for (Coalition coalition : coalitions){
                 std::cout << "Coalition " << i <<": ";

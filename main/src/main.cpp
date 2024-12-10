@@ -1167,9 +1167,10 @@ int main(){
             
 
 
-            cout << "not making a partition" << endl;
-            // Classroom::Partition myParition = Classroom::Partition(coalitionSet);
-            // myParition.printParition();
+            cout << "making a partition" << endl;
+            Classroom::Partition myParition = Classroom::Partition(coalitionSet);
+            cout << "parition made" <<  endl;
+            myParition.printParition();
 
 
 
