@@ -994,6 +994,128 @@ void Classroom::printStudents(){
     cout << endl;
 }
 
+
+
+
+// Utility function to print the partitions
+void printPartitions(const set<set<set<int>>>& partitions) {
+    int count = 1;
+    cout<< "printing partition";
+    for (const auto& partition : partitions) {
+        cout << "Partition " << count++ << ": { ";
+        for (const auto& coalition : partition) {
+            cout << "{ ";
+            for (int elem : coalition) {
+                cout << elem << " ";
+            }
+            cout << "} ";
+        }
+        cout << "}\n";
+    }
+}
+
+void printParition(const set<set<int>>& partition) {
+        cout << "Partition " <<  ": { ";
+        for (const auto& coalition : partition) {
+            cout << "{ ";
+            for (int elem : coalition) {
+                cout << elem << " ";
+            }
+            cout << "} ";
+        }
+        cout << "}\n";
+
+}
+
+void printCoalition(const set<int>& coalition) {
+    cout << "{ ";
+    for (int elem : coalition) {
+        cout << elem << " ";
+    }
+    cout << "} ";
+}
+
+
+
+// Function to convert vector<vector<int>> to set<set<int>>
+set<set<int>> convertToSetOfSets(const vector<vector<int>>& vecOfVecs) {
+    set<set<int>> result;
+
+    for (const auto& vec : vecOfVecs) {
+        // Convert each vector<int> to set<int> and insert into the result
+        result.insert(set<int>(vec.begin(), vec.end()));
+    }
+
+    return result;
+}
+
+ 
+// Function to generate all partitions
+void Partition(vector<int> sete, int index,
+               vector<vector<int> >& ans, set<set<set<int>>>& finalPartition)
+{
+ 
+    // If we have considered all elements
+    // in the set print the partition
+    if (index == sete.size()) {
+        // printPartition(ans);
+        finalPartition.insert(convertToSetOfSets(ans));
+        return;
+    }
+ 
+    // For each subset in the partition
+    // add the current element to it
+    // and recall
+    for (int i = 0; i < ans.size(); i++) {
+        ans[i].push_back(sete[index]);
+        Partition(sete, index + 1, ans, finalPartition);
+        ans[i].pop_back();
+    }
+ 
+    // Add the current element as a
+    // singleton subset and recall
+    ans.push_back({ sete[index] });
+    Partition(sete, index + 1, ans, finalPartition);
+    ans.pop_back();
+}
+ 
+// Function to generate all
+// partitions for a given set
+set<set<set<int>>> allPartitions(vector<int> sete)
+{
+    vector<vector<int> > v;
+    set<set<set<int>>> theFinal;
+    Partition(sete, 0, v, theFinal);
+    return theFinal;
+}
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 int main(){
     int choice;
     cout << "Options: " << endl;
@@ -1196,6 +1318,37 @@ int main(){
             Classroom::Partition myParition = Classroom::Partition(coalitionSet);
             cout << "parition made" <<  endl;
             myParition.printParition();
+
+            // Input set
+            // Input set
+            set<int> inputSet = {1, 2, 3, 4};
+
+            // Generate all partitions
+            set<set<set<int>>> all;
+
+            // Print the result
+            // cout << "All partitions of the set: { ";
+            // for (int elem : inputSet) cout << elem << " ";
+            // cout << "}\n";
+
+            // printPartitions(allPartitions);
+
+
+            // The size of the set
+            int n = 5;
+        
+            // Initialize the set as
+            // {1, 2, ..., n}
+            vector<int> set(n);
+            for (int i = 0; i < n; i++) {
+                set[i] = i + 1;
+            }
+            cout << "All partition of the set will be : " << endl;
+        
+            // Generate all partitions of the set
+            all = allPartitions(set);
+            printPartitions(all);
+
 
 
 
