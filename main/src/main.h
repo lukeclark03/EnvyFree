@@ -165,7 +165,7 @@ struct Classroom {
 
         }
         // std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
-        void printParition(){
+        void printPartition(){
             std::cout << "Printing partition below, "<< numStudents << " students" << std::endl;
             int i = 0;
             for (Coalition coalition : coalitions){
@@ -189,8 +189,15 @@ struct Classroom {
             int i = 0;
             for (auto it = adjacencies.begin();  it != adjacencies.end(); it++ ) {
                 std::cout << std::endl << "adjancency " << i << std::endl;
-                it->second->printParition();
+                std::cout << "Adjacency contains the set of students: " << std::endl;
+                std::cout << "{ ";
+                for (int elem : it->first) {
+                    std::cout << elem << " ";
+                }
+                std::cout << "} " << std::endl;
+                it->second->printPartition();
                 std::cout << std::endl << "end adjancency " << i << std::endl << std::endl;
+                i++;
             }
             if (adjacencies.empty())
                 std::cout << "Could not print adjacents." << std::endl << std::endl;
@@ -276,7 +283,7 @@ struct Classroom {
     Coalition createCoalition(std::set<int> IDs);
 
     void addToCoalitionMap(std::set<int> IDs);
-    void createParitions();
+    void createPartitions();
     std::set<std::set<int>> breakPartition(std::set<std::set<int>> partition, std::set<int> defectors);
     void fillAdjacencies(Partition* p);
     void fillAllAdjacencies();

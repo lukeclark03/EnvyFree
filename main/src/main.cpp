@@ -1014,7 +1014,7 @@ void printPartitions(const set<set<set<int>>>& partitions) {
     }
 }
 
-void printParition(const set<set<int>>& partition) {
+void printPartition(const set<set<int>>& partition) {
         cout << "Partition " <<  ": { ";
         for (const auto& coalition : partition) {
             cout << "{ ";
@@ -1093,7 +1093,7 @@ set<set<set<int>>> allPartitions(vector<int> sete)
 
 
 
-void Classroom::createParitions(){
+void Classroom::createPartitions(){
     // this function populates the round with the partitions;
     // TODO: delete information properly to avoid memory leaks
     round.coalitionMap.clear();
@@ -1137,7 +1137,7 @@ void Classroom::printPartitions(){
     int i = 0;
     for (Partition* p : round.Partitions){
         cout << "Partition " << i << " :" << endl;
-        p->printParition();
+        p->printPartition();
         p->printAdjacencies();
         i++;
     }
@@ -1182,15 +1182,15 @@ void Classroom::thinAllAdjacencies(){
 
 void Classroom::thinAdjacencies(Partition* p){
     cout << "thinning adjacencies on partition" << endl;
-    p->printParition();
+    p->printPartition();
     cout << p->adjacencies.size();
     for (auto map_element : p->adjacencies){
         set<int> coalition = map_element.first;
         Partition* q = map_element.second;
         cout << "considering partition: " << endl;
-        p->printParition();
+        p->printPartition();
         cout << "against partition: "<< endl;
-        q->printParition();
+        q->printPartition();
 
 
 
@@ -1474,10 +1474,10 @@ int main(){
 
 
             // cout << "making a partition" << endl<< endl<<endl;
-            // Classroom::Partition myParition = Classroom::Partition(coalitionSet);
+            // Classroom::Partition myPartition = Classroom::Partition(coalitionSet);
             // cout << "printing the partition" << endl<< endl<<endl;
-            // myParition.printParition();
-            room.createParitions();
+            // myPartition.printPartition();
+            room.createPartitions();
             cout << endl<< endl<< endl<< endl<< endl<< endl<< endl<< endl;
             room.printPartitions();
             cout << "finished printing Partitions, now filling adjacencies" << endl;
