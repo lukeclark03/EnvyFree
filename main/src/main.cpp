@@ -1161,7 +1161,7 @@ void Classroom::fillAdjacencies(Partition* p){
     // need to consider every coalition as the defectors
     // cout << "filling adjacencies for partition: " << endl;
     // p->printParition();
-    printParition(p->coalition_IDs);
+    printPartition(p->coalition_IDs);
     // cout << round.coalitionMap.size() << " many iterations for each coalition" << endl;
     for(auto map_element : round.coalitionMap){
         set<int> coalition = map_element.first;
@@ -1174,11 +1174,11 @@ void Classroom::fillAdjacencies(Partition* p){
             // coalition is the set of defectors, p->coalition_Ids is the partition
             set<set<int>> newPartitionIDs = breakPartition(p->coalition_IDs, coalition);
             // cout << "this coalition gives partition" ;
-            printParition(newPartitionIDs);
+            printPartition(newPartitionIDs);
             // now we get the partition pointer from the map in round
             Partition* q = round.partitionMap[newPartitionIDs];
             // cout << "that partition has map ";
-            q->printParition();
+            q->printPartition();
             // now, we add q to the Partition's adjacencies with the proper key, which is the coalition itself. 
             p->adjacencies[coalition] = q;
         }
