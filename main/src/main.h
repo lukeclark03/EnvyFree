@@ -188,19 +188,16 @@ struct Classroom {
             std::cout << std::endl <<  "Printing adjacent partitions" << std::endl;
             int i = 0;
             for (auto it = adjacencies.begin();  it != adjacencies.end(); it++ ) {
-                std::cout << std::endl << "adjancency " << i << std::endl;
-                std::cout << "Adjacency contains the set of students: " << std::endl;
+                std::cout << std::endl << "\t Adjacency " << i << "contains the set of students: ";
                 std::cout << "{ ";
                 for (int elem : it->first) {
                     std::cout << elem << " ";
                 }
-                std::cout << "} " << std::endl;
-                it->second->printPartition();
-                std::cout << std::endl << "end adjancency " << i << std::endl << std::endl;
+                std::cout << "} " << std::endl << std::endl;
                 i++;
             }
             if (adjacencies.empty())
-                std::cout << "Could not print adjacents." << std::endl << std::endl;
+                std::cout << "Could not print adjacents." << std::endl;
         }
 
         std::set<Coalition> coalitions;
