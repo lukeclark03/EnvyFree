@@ -202,6 +202,8 @@ struct Classroom {
         std::map<int, double> studentExpectedPayoffs;
         // std::set<Partition*> adjacencies;
         std::map<std::set<int>, Partition*> adjacencies;
+        std::set<Partition*> weak_adjacents;
+        std::set<Partition*> strong_adjacents;
 
 
 
@@ -278,7 +280,10 @@ struct Classroom {
     std::set<std::set<int>> breakPartition(std::set<std::set<int>> partition, std::set<int> defectors);
     void fillAdjacencies(Partition* p);
     void fillAllAdjacencies();
+    void thinAdjacencies(Partition* p);
+    void thinAllAdjacencies();
     void printPartitions();
+
 
 };
 
