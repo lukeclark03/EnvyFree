@@ -1171,6 +1171,64 @@ void Classroom::fillAdjacencies(Partition* p){
     }
 }
 
+void Classroom::thinAllAdjacencies(){
+    for (Partition* p : round.Partitions){
+        p->strong_adjacents.clear();
+        p->weak_adjacents.clear();
+        thinAdjacencies(p);
+    }
+}
+
+void Classroom::thinAdjacencies(Partition* p){
+    cout << "thinning adjacencies on partition" << endl;
+    p->printParition();
+    cout << p->adjacencies.size();
+    for (auto map_element : p->adjacencies){
+        set<int> coalition = map_element.first;
+        Partition* q = map_element.second;
+        cout << "considering partition: " << endl;
+        p->printParition();
+        cout << "against partition: "<< endl;
+        q->printParition();
+
+
+
+        // we want to consider the IDs in the coalition, and see if they do actually prefer q over p, if they all do prefer it, it is in the strong adjacencies, some prefer, and some don't, then it is in the weak adjacencies, and if everyone is indifferent, then they are not adjacent.
+        bool strong = true;
+        bool weak = true;
+        bool indifferent = true;
+        cout << "begginning iteration through a coalition" << endl;
+        for (int i : coalition){
+            cout << "considering student " << i << endl;
+            cout << "i may get " << p->studentExpectedPayoffs[i] << "under current partition, or " << q->studentExpectedPayoffs[i] << "with the coalition: " << endl;
+            printCoalition(coalition);
+            if (q->studentExpectedPayoffs[i] < p->studentExpectedPayoffs[i]){
+                // we have someone in the coalition who prefers the current coalition to the other choice.
+                strong = false;
+                weak = false;
+                indifferent = false;
+            } else if (q->studentExpectedPayoffs[i] == p->studentExpectedPayoffs[i]){
+                // this current person is indifferent, so the adjacency is not strong
+                strong = false;
+
+            } else {
+                // this current person does actually prefer q over p, so strong and weak remain true, indifferent is false;
+                indifferent = false;
+            }
+        } 
+        if (strong){
+            p->strong_adjacents.insert(q);
+        }
+        if (weak & !indifferent){
+            p->weak_adjacents.insert(p);
+        }
+    }
+}
+
+
+
+
+
 set<set<int>> Classroom::breakPartition(set<set<int>> OrigPartition, set<int> defectors){
     set<set<int>> newPartition = OrigPartition;
     for (auto coalition : newPartition){
@@ -1421,7 +1479,11 @@ int main(){
             room.createParitions();
             cout << endl<< endl<< endl<< endl<< endl<< endl<< endl<< endl;
             room.printPartitions();
+            cout << "finished printing Partitions, now filling adjacencies" << endl;
             room.fillAllAdjacencies();
+            cout << "finished filling adjacencies, now thinning adjacencies" << endl;
+            room.thinAllAdjacencies();
+            cout << "finished excecution" << endl;
 
             // Input set
             // Input set
