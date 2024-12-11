@@ -164,13 +164,6 @@ struct Classroom {
             }
 
         }
-
-        std::set<Coalition> coalitions;
-        std::set<std::set<int>> coalition_IDs;
-        int numStudents;
-        std::map<int, double> studentExpectedPayoffs;
-        std::set<Partition*> adjacencies;
-
         // std::map<int, double> calculateExpectedPayoffs(std::set<Coalition> coalitions);
         void printParition(){
             std::cout << "Printing partition below, "<< numStudents << " students" << std::endl;
@@ -189,6 +182,14 @@ struct Classroom {
                 std::cout << "ID: " << pair.first << ", Payoff: " << pair.second << "\n";
             }
         }
+        std::set<Coalition> coalitions;
+        std::set<std::set<int>> coalition_IDs;
+        int numStudents;
+        std::map<int, double> studentExpectedPayoffs;
+        // std::set<Partition*> adjacencies;
+        std::map<std::set<int>, Partition*> adjacencies;
+
+
             
         
 
@@ -202,6 +203,8 @@ struct Classroom {
         // This  is all of the coalitions precalculated to make the parititions quicker
         std::vector<Partition*> Partitions;
         // this is all of the partitions of the current game, and they should be linked properly.
+        std::map<std::set<std::set<int>>, Partition*> partitionMap;
+        // This is a map to more easily access the particular partition pointer.
         // int numStudents;
         // void addToCoalitionMap(std::set<int> IDs);
         // void createParitions();
@@ -258,8 +261,9 @@ struct Classroom {
 
     void addToCoalitionMap(std::set<int> IDs);
     void createParitions();
-    void fillAdjacencies();
     std::set<std::set<int>> breakPartition(std::set<std::set<int>> partition, std::set<int> defectors);
+    void fillAdjacencies(Partition* p);
+    void fillAllAdjacencies();
     void printPartitions();
 
 };
