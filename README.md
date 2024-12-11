@@ -1,26 +1,39 @@
-# EnvyFree
-Envy-Free Cake Cutter's Cooperative Game Theory Project
-Here is the readme First Commit!!
+# Final Game Concepts
 
+Our game is an $N$ player game with $K$ seats and $R$ rows. Players are at first randomly seated and then, for each round, able to move to different seats in any row. 
 
-# TEMP: Greedy vs Selfless Student Seating Thoughts
+Their goal is to maximize their utility up to a threshold $T$, where their utility is assigned by how far (how many seats away) are their nearest neighbor in the same row. If someone's utility is zero, it means that they are sharing a space with someone else; this means that no matter how many people are sitting in one seat, they all get utility 0. If they are in a seat alone, where either or both seats beside them are filled, they get utility 1. If they have a seat empty on both sides of them, but someone is sitting 1 away, they have utility 2. Basically, the utility is the occupancy of their seat plus the distance to the nearest person.
 
-A greedy student takes into consideration all rows when considering which row to sit in. This means that they will have to find the best seat to sit in for each row and get the penalty associated with it. The best greedy seat for each row could be implemented as a variable so that it doesn't have to be calculated every time. For an empty classroom with no other students, the greedy student would receive the lowest penalty (0) from sitting in his preferred row with no other students in that row. If there was a single student in his preferred row and no other students anywhere else, the greedy student would once again examine all rows and pick the one with the lowest penalty. When examining a row with a student already in it, he should calculate the penalty that he will receive from sitting in the furthest seat away from all other students in the row, creating the largest gap that he can between him and all other students in the row. If a gap between him and another student is closer, then penalty will be larger, and he will be incentivized to just sit in a different row (more about this later). When examining a row without any students in it, the penalty level that he will assign to sitting in that row should be dependent on how close that row is to his preferred row. If it is one row away from his preferred row, then the penalty should not be significant, but the penalty will become significant for further away rows and the greedy student may end up calculating a lower penalty level in a row that has another student in it that is closer to his preferred row. With a penalty of 0 to 100 for example, sitting n rows away from the preferred row might incur a penalty of 10n. For sitting in a row with other students in it, perhaps the penalty for sitting n seats away from another student in the same row would be 100/(n^2), which would result in a penalty of 100 for 1 seat away, 25 for 2 seats away, 11 for 3, 6 for 4, etc.
+The threshold is usually assigned 3, since this is a small but interesting number - if it were 0, anyone would tolerate anyone sitting anywhere. A similar phenomenon happens with 1, and thus we chose 3 to produce interesting but not extreme results. Therefore, please assume that the threshold is always three in this document.
 
-A non greedy student is a lot more simple for my simplified implementation. I simply made the selfless students pick their preferred row until the density of it was higher than the expected density value of the classroom. When sitting in any row, they would simply sit as close to the lowest seat number as possible that would be a multiple of (1/(fullness_expectancy/100)). In other words 1/(50% fullness/100) would be 2, 1/(25%/100) would be 4, etc. If a greedy student had caused there not to be a seat in their preferred row that allowed for an even distribution, assuming the density of that row was still lower than their expectation of the classroom fullness, then they would use the greedy method for finding the best seat within that row. Ideally they would never revert to the greedy method, but the method is already very simplified because it doesn’t take into consideration the positions of the greedy students in that row, which would make it difficult to calculate.
+First, we made it so that players would move one at a time, randomly. Later, we changed this so that the players who were most disadvantaged in their utilities would be selected first to move. Then, we implemented coalitional moving, so that a group could be randomly chosen if one of their members were to be picked. This required us to calculate the payoffs of the entire group, such that members could prefer the payoff when able to move with other people into what could be a larger contiguous space to space themselves apart with better payoffs than if only one person could move.
 
+## Payoffs within coalitional arrangements
+- The payoffs which are calculated for a certain person in a certain coalitional arrangement per round are now calculated as the average payoff they can get based on whether their group is chosen vs whether their group is not chosen, so if a person was in a group by themselves and there were two other coalitions of 3, and 5, then they would have a 1/9 chance to get picked and get the best seat obtainable by just moving by themselves, 1/3 of a chance to get the payoff that the 3 person group would let them have, and 5/9 of a chance to get the payoff that the 5 person group would let them have: thus they would get a payoff of $A/9$ + $B/3$ + $C*5/9$ if A, B, and C were the payoffs in each situation.
 
-# Explanation of making the dynamics graph
+## Optimality
+In order to find if  the solution the players take is a close to good solution, we compare it to an optimal, assigned solution, where for each row of $s$ seats, we can assign $n$ students so they receive a maximum payoff, if the number of students $n$ is divisible by $r$.
+- $s \geq 3n - 2r$
+	- All players will receive 3 utility 
+- $2n - r < s \leq 3n - 2r$
+	- Some players will receive 3, some may receive 2 utility.
+- $n < s \leq 2n - r$
+	- Some players will receive 2, some may receive 1 utility.
+-  $s \leq n$
+	- Some players will receive 1, some may receive 0 utility.
+	
+For arranging without n being divisible by r, just split the rows into sub-situations where the remainder gets distributed among several of the rows, randomly.
+## Explanation of making the dynamics graph
 
 For every round, we must consider the partitions that can be made, i.e. the groups of coalitions that can be made up from the set of all students.
-## Pseudocode
-To create a list of adjacent partitions $A$,
+### Pseudocode
+To create a list of adjacent partitions $A$
 For every possible partition $P$ formed from the set of students $S$
 - For every possible coalition $D$ formed from the set of students $S$
 	- Create a partition $Q$ 
 	- For every coalition $C \in P$
-		- Create a coalition $R = \{ C - D\}$
-		- If $R \neq \emptyset$
-			- Add $R$ to $Q$ 
+		- Create a coalition $U = \{ C - D\}$
+		- If $U \neq \emptyset$
+			- Add $U$ to $Q$ 
 	- Add $D$ to $Q$ 
 	- Add $Q$ to the set of adjacent partitions $A$
