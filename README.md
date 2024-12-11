@@ -9,3 +9,18 @@ A greedy student takes into consideration all rows when considering which row to
 
 A non greedy student is a lot more simple for my simplified implementation. I simply made the selfless students pick their preferred row until the density of it was higher than the expected density value of the classroom. When sitting in any row, they would simply sit as close to the lowest seat number as possible that would be a multiple of (1/(fullness_expectancy/100)). In other words 1/(50% fullness/100) would be 2, 1/(25%/100) would be 4, etc. If a greedy student had caused there not to be a seat in their preferred row that allowed for an even distribution, assuming the density of that row was still lower than their expectation of the classroom fullness, then they would use the greedy method for finding the best seat within that row. Ideally they would never revert to the greedy method, but the method is already very simplified because it doesn’t take into consideration the positions of the greedy students in that row, which would make it difficult to calculate.
 
+
+# Explanation of making the dynamics graph
+
+For every round, we must consider the partitions that can be made, i.e. the groups of coalitions that can be made up from the set of all students.
+## Pseudocode
+To create a list of adjacent partitions $A$,
+For every possible partition $P$ formed from the set of students $S$
+- For every possible coalition $D$ formed from the set of students $S$
+	- Create a partition $Q$ 
+	- For every coalition $C \in P$
+		- Create a coalition $R = \{ C - D\}$
+		- If $R \neq \emptyset$
+			- Add $R$ to $Q$ 
+	- Add $D$ to $Q$ 
+	- Add $Q$ to the set of adjacent partitions $A$
