@@ -12,13 +12,15 @@ A non greedy student is a lot more simple for my simplified implementation. I si
 
 # Explanation of making the dynamics graph
 
-For every round, we must consider the partitions that can be made, i.e. the groups of coalitions that can be made up from the set of students.
-
-Thus, for every possible partition $P$ formed from students $S$
-- For every possible coalition $D$ formed from students $S$
+For every round, we must consider the partitions that can be made, i.e. the groups of coalitions that can be made up from the set of all students.
+## Pseudocode
+To create a list of adjacent partitions $A$,
+For every possible partition $P$ formed from the set of students $S$
+- For every possible coalition $D$ formed from the set of students $S$
 	- Create a partition $Q$ 
 	- For every coalition $C \in P$
 		- Create a coalition $R = \{ C - D\}$
 		- If $R \neq \emptyset$
 			- Add $R$ to $Q$ 
-	- Add $D$ to $Q$
+	- Add $D$ to $Q$ 
+	- Add $Q$ to the set of adjacent partitions $A$
