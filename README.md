@@ -1,6 +1,6 @@
 # Final Game Concepts
 
-Our game is an $N$ player game with $K$ seats and $R$ rows. Players are at first randomly seated and then, for each round, able to move to different seats in any row. 
+Our game is an $N$ player game with $K$ seats and $R$ rows. Players are at first randomly seated and then, for each round, able to move to different seats in any row.
 
 Their goal is to maximize their utility up to a threshold $T$, where their utility is assigned by how far (how many seats away) are their nearest neighbor in the same row. If someone's utility is zero, it means that they are sharing a space with someone else; this means that no matter how many people are sitting in one seat, they all get utility 0. If they are in a seat alone, where either or both seats beside them are filled, they get utility 1. If they have a seat empty on both sides of them, but someone is sitting 1 away, they have utility 2. Basically, the utility is the occupancy of their seat plus the distance to the nearest person.
 
@@ -8,6 +8,7 @@ The threshold is usually assigned 3, since this is a small but interesting numbe
 
 First, we made it so that players would move one at a time, randomly. Later, we changed this so that the players who were most disadvantaged in their utilities would be selected first to move. Then, we implemented coalitional moving, so that a group could be randomly chosen if one of their members were to be picked. This required us to calculate the payoffs of the entire group, such that members could prefer the payoff when able to move with other people into what could be a larger contiguous space to space themselves apart with better payoffs than if only one person could move.
 
+Players can also be made to implement a best-response dynamic when they cannot further increase their own utility, to move such that they maintain their utility while increasing the utility of players who have gained less utility.
 ## Payoffs within coalitional arrangements
 - The payoffs which are calculated for a certain person in a certain coalitional arrangement per round are now calculated as the average payoff they can get based on whether their group is chosen vs whether their group is not chosen, so if a person was in a group by themselves and there were two other coalitions of 3, and 5, then they would have a 1/9 chance to get picked and get the best seat obtainable by just moving by themselves, 1/3 of a chance to get the payoff that the 3 person group would let them have, and 5/9 of a chance to get the payoff that the 5 person group would let them have: thus they would get a payoff of $A/9$ + $B/3$ + $C*5/9$ if A, B, and C were the payoffs in each situation.
 
