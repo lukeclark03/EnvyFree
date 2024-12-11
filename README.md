@@ -27,6 +27,11 @@ For arranging without n being divisible by r, just split the rows into sub-situa
 ## Explanation of making the dynamics graph
 
 For every round, we must consider the partitions that can be made, i.e. the groups of coalitions that can be made up from the set of all students.
+The code therefore will output the number of partitions corresponding to the [Bell number](https://en.wikipedia.org/wiki/Bell_number). 
+
+Then, for each adjacency, the player payoffs must be calculated as so then we can understand when players may prefer an adjacency over the current situation, or be indifferent or even against changing the current arrangement. If a player is against forming a group with them being added to the group, that group will not form.
+
+Strong adjacencies are defined where all people who want to form the coalition are not indifferent, and weak adjacencies are thus when at least one person is indifferent to choosing to be in the new coalition.
 ### Pseudocode
 To create a list of adjacent partitions $A$
 For every possible partition $P$ formed from the set of students $S$
