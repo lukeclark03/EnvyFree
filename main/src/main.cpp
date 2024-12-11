@@ -1162,7 +1162,7 @@ void Classroom::fillAdjacencies(Partition* p){
     // need to consider every coalition as the defectors
     // cout << "filling adjacencies for partition: " << endl;
     // p->printParition();
-    printPartition(p->coalition_IDs);
+    // printPartition(p->coalition_IDs);
     // cout << round.coalitionMap.size() << " many iterations for each coalition" << endl;
     for(auto map_element : round.coalitionMap){
         set<int> coalition = map_element.first;
@@ -1175,11 +1175,11 @@ void Classroom::fillAdjacencies(Partition* p){
             // coalition is the set of defectors, p->coalition_Ids is the partition
             set<set<int>> newPartitionIDs = breakPartition(p->coalition_IDs, coalition);
             // cout << "this coalition gives partition" ;
-            printPartition(newPartitionIDs);
+            // printPartition(newPartitionIDs);
             // now we get the partition pointer from the map in round
             Partition* q = round.partitionMap[newPartitionIDs];
             // cout << "that partition has map ";
-            q->printPartition();
+            // q->printPartition();
             // now, we add q to the Partition's adjacencies with the proper key, which is the coalition itself. 
             p->adjacencies[coalition] = q;
         }
@@ -1195,16 +1195,16 @@ void Classroom::thinAllAdjacencies(){
 }
 
 void Classroom::thinAdjacencies(Partition* p){
-    cout << "thinning adjacencies on partition" << endl;
-    p->printPartition();
-    cout << p->adjacencies.size();
+    // cout << "thinning adjacencies on partition" << endl;
+    // p->printPartition();
+    // cout << p->adjacencies.size();
     for (auto map_element : p->adjacencies){
         set<int> coalition = map_element.first;
         Partition* q = map_element.second;
-        cout << "considering partition: " << endl;
-        p->printPartition();
-        cout << "against partition: "<< endl;
-        q->printPartition();
+        // cout << "considering partition: " << endl;
+        // p->printPartition();
+        // cout << "against partition: "<< endl;
+        // q->printPartition();
 
 
 
@@ -1212,11 +1212,11 @@ void Classroom::thinAdjacencies(Partition* p){
         bool strong = true;
         bool weak = true;
         bool indifferent = true;
-        cout << "begginning iteration through a coalition" << endl;
+        // cout << "begginning iteration through a coalition" << endl;
         for (int i : coalition){
-            cout << "considering student " << i << endl;
-            cout << "i may get " << p->studentExpectedPayoffs[i] << "under current partition, or " << q->studentExpectedPayoffs[i] << "with the coalition: " << endl;
-            printCoalition(coalition);
+            // cout << "considering student " << i << endl;
+            // cout << "i may get " << p->studentExpectedPayoffs[i] << "under current partition, or " << q->studentExpectedPayoffs[i] << "with the coalition: " << endl;
+            // printCoalition(coalition);
             if (q->studentExpectedPayoffs[i] < p->studentExpectedPayoffs[i]){
                 // we have someone in the coalition who prefers the current coalition to the other choice.
                 strong = false;
@@ -1478,7 +1478,7 @@ int main(){
                 throw invalid_argument("Must be a positive number");
 
             // Create classroom and seat students
-            Classroom room(input_seats, input_rows, input_students, input_maxutil, true);
+            Classroom room(input_seats, input_rows, input_students, input_maxutil, false);
             cout << "Created Classroom. Seating all students" << endl;
             room.sitAllStudents(true);
             // room.iteratedBestResponse();
@@ -1523,12 +1523,14 @@ int main(){
             // Classroom::Partition myPartition = Classroom::Partition(coalitionSet);
             // cout << "printing the partition" << endl<< endl<<endl;
             // myPartition.printPartition();
+            cout << " finished seating students, now creating partitions" << endl;
+
             room.createPartitions();
             cout << endl<< endl<< endl<< endl<< endl<< endl<< endl<< endl;
             cout << "finished creating Partitions, now filling adjacencies" << endl;
             room.fillAllAdjacencies();
             cout << "finished creating adjacencies, now  printing them" << endl;
-            room.printPartitions();
+            // room.printPartitions();
             cout << "finished filling adjacencies, now thinning adjacencies" << endl;
             
 
