@@ -1159,15 +1159,28 @@ void Classroom::fillAllAdjacencies(){
 void Classroom::fillAdjacencies(Partition* p){
     // this function fills the adjacencies of one partition in the round
     // need to consider every coalition as the defectors
+    // cout << "filling adjacencies for partition: " << endl;
+    // p->printParition();
+    printParition(p->coalition_IDs);
+    // cout << round.coalitionMap.size() << " many iterations for each coalition" << endl;
     for(auto map_element : round.coalitionMap){
+        set<int> coalition = map_element.first;
+        // cout << "considering the coalition";
+        // printCoalition(coalition);
+        // cout << endl;
         // We only do this if we have reached a different partition, by using a coalition that is not in the partition
-        if (p->coalition_IDs.count(map_element.first) == 0){
-            // map_element.first is the set of defectors, p->coalition_Ids is the partition
-            set<set<int>> newPartitionIDs = breakPartition(p->coalition_IDs, map_element.first);
+        if (p->coalition_IDs.count(coalition) == 0){
+            // cout << "did not find the coalition wihtin partition, so analyzing it further" << endl;
+            // coalition is the set of defectors, p->coalition_Ids is the partition
+            set<set<int>> newPartitionIDs = breakPartition(p->coalition_IDs, coalition);
+            // cout << "this coalition gives partition" ;
+            printParition(newPartitionIDs);
             // now we get the partition pointer from the map in round
             Partition* q = round.partitionMap[newPartitionIDs];
+            // cout << "that partition has map ";
+            q->printParition();
             // now, we add q to the Partition's adjacencies with the proper key, which is the coalition itself. 
-            p->adjacencies[map_element.first] = q;
+            p->adjacencies[coalition] = q;
         }
     }
 }
@@ -1231,21 +1244,41 @@ void Classroom::thinAdjacencies(Partition* p){
 
 
 set<set<int>> Classroom::breakPartition(set<set<int>> OrigPartition, set<int> defectors){
-    set<set<int>> newPartition = OrigPartition;
-    for (auto coalition : newPartition){
-        // we consider each coalition within the partition, and remove any and all defectors from it
+    // set<set<int>> newPartition = OrigPartition;
+    // for (auto coalition : newPartition){
+    //     // we consider each coalition within the partition, and remove any and all defectors from it
+    //     for (int defector : defectors){
+    //         coalition.erase(defector);
+    //     }
+    //     // we see if there are any members left in the coalition, we remove from the partition if not
+    //     if (coalition.size() == 0) {
+    //         newPartition.erase(coalition);
+    //     }
+    // }
+    // // we add the defector coalition back into the partition
+    // newPartition.insert(defectors);
+    // // this is the new partition that we wanted, we return it
+    // return newPartition;
+
+    set<set<int>> newPartition;
+    for(auto coalition : OrigPartition){
+        // we consider each coalition in original partition, 
+        // remove all of the defectors
         for (int defector : defectors){
             coalition.erase(defector);
         }
-        // we see if there are any members left in the coalition, we remove from the partition if not
-        if (coalition.size() == 0) {
-            newPartition.erase(coalition);
+        // now, if this coalition has non-zero size, we add it to the new partition
+        if (coalition.size() >0){
+            newPartition.insert(coalition);
         }
     }
-    // we add the defector coalition back into the partition
+
     newPartition.insert(defectors);
-    // this is the new partition that we wanted, we return it
     return newPartition;
+
+
+
+
 }
 
 
@@ -1435,12 +1468,12 @@ int main(){
             Classroom room(input_seats, input_rows, input_students, input_maxutil, true);
             cout << "Created Classroom. Seating all students" << endl;
             room.sitAllStudents(true);
-            // room.iteratedBestResponse();
+            room.iteratedBestResponse();
             map<int, pair<int, int>> PPexample;
-            PPexample[0] = make_pair(0, 0);
-            PPexample[1] = make_pair(0, 1);
-            PPexample[2] = make_pair(0, 2);
-            room.moveStudents(PPexample);
+            // PPexample[0] = make_pair(0, 0);
+            // PPexample[1] = make_pair(0, 1);
+            // PPexample[2] = make_pair(0, 2);
+            // room.moveStudents(PPexample);
 
 
 
@@ -1479,10 +1512,14 @@ int main(){
             // myParition.printParition();
             room.createParitions();
             cout << endl<< endl<< endl<< endl<< endl<< endl<< endl<< endl;
-            room.printPartitions();
-            cout << "finished printing Partitions, now filling adjacencies" << endl;
+            cout << "finished creating Partitions, now filling adjacencies" << endl;
             room.fillAllAdjacencies();
+            cout << "finished creating adjacencies, now  printing them" << endl;
+            room.printPartitions();
             cout << "finished filling adjacencies, now thinning adjacencies" << endl;
+            
+
+
             room.thinAllAdjacencies();
             cout << "finished excecution" << endl;
 
