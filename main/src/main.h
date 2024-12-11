@@ -215,6 +215,7 @@ struct Classroom {
         std::set<Coalition> coalitions;
         std::set<std::set<int>> coalition_IDs;
         int numStudents;
+        int pID;
         std::map<int, double> studentExpectedPayoffs;
         // std::set<Partition*> adjacencies;
         std::map<std::set<int>, Partition*> adjacencies;
@@ -298,7 +299,10 @@ struct Classroom {
     void fillAllAdjacencies();
     void thinAdjacencies(Partition* p);
     void thinAllAdjacencies();
+    void printBasicPartitions();
     void printPartitions();
+    void printWeakAdjacency();
+    void printStrongAdjacency();
 
 
 };

@@ -1015,7 +1015,7 @@ void printPartitions(const set<set<set<int>>>& partitions) {
 }
 
 void printPartition(const set<set<int>>& partition) {
-        cout << "Partition " <<  ": { ";
+        cout <<  "{ ";
         for (const auto& coalition : partition) {
             cout << "{ ";
             for (int elem : coalition) {
@@ -1121,6 +1121,7 @@ void Classroom::createPartitions(){
 
         // now each of the coalitions is gauranteed to be formed, so we get all of them and then put them into the partition constructor
         Partition* p = new Partition(partitionConstructorInput);
+        p->pID = round.Partitions.size();
         round.Partitions.push_back(p);
         round.partitionMap[partition] = p;
     }
@@ -1244,22 +1245,6 @@ void Classroom::thinAdjacencies(Partition* p){
 
 
 set<set<int>> Classroom::breakPartition(set<set<int>> OrigPartition, set<int> defectors){
-    // set<set<int>> newPartition = OrigPartition;
-    // for (auto coalition : newPartition){
-    //     // we consider each coalition within the partition, and remove any and all defectors from it
-    //     for (int defector : defectors){
-    //         coalition.erase(defector);
-    //     }
-    //     // we see if there are any members left in the coalition, we remove from the partition if not
-    //     if (coalition.size() == 0) {
-    //         newPartition.erase(coalition);
-    //     }
-    // }
-    // // we add the defector coalition back into the partition
-    // newPartition.insert(defectors);
-    // // this is the new partition that we wanted, we return it
-    // return newPartition;
-
     set<set<int>> newPartition;
     for(auto coalition : OrigPartition){
         // we consider each coalition in original partition, 
@@ -1276,14 +1261,19 @@ set<set<int>> Classroom::breakPartition(set<set<int>> OrigPartition, set<int> de
     newPartition.insert(defectors);
     return newPartition;
 
-
-
-
 }
 
 
 
-
+void Classroom::printBasicPartitions(){
+    cout << "Partition List" << endl;
+    for (int i = 0; i < round.Partitions.size(); i++){
+        cout << "Partition " << i << ": ";
+        printPartition(round.Partitions[i]->coalition_IDs);
+        // cout << round.Partitions[i] ->pID;
+        // cout << endl;
+    }
+}
 
 
 
@@ -1521,6 +1511,7 @@ int main(){
 
 
             room.thinAllAdjacencies();
+            room.printBasicPartitions();
             cout << "finished excecution" << endl;
 
             // Input set
