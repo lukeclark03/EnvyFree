@@ -1138,6 +1138,7 @@ void Classroom::printPartitions(){
     for (Partition* p : round.Partitions){
         cout << "Partition " << i << " :" << endl;
         p->printParition();
+        p->printAdjacencies();
         i++;
     }
     cout << "there are " << round.coalitionMap.size() << " many coalitions in our set" << endl;

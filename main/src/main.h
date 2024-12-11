@@ -50,13 +50,13 @@ struct Student {
         } else {
             std::cout << "and has payoff: " << payoff << std::endl;
             // Implemented per student if we want to include personal space as a factor, for example
-            // std::cout << "and has preferred maximum utility: " << max_utility << "\n";  
+            // std::cout << "and has preferred maximum utility: " << max_utility << "\n";
         }
     }
 
     //  Keep for future if needed
     std::vector<int> withoutSelfDistances(std::vector<int>& current_row, std::vector<int>& current_row_distances) {
-        
+
         std::vector<int> selfdist(current_row_distances);
         // Add case where set where seat is more than 1 -> no change in vector
         // return current_row;
@@ -81,7 +81,7 @@ struct Student {
         // Case 1: Surrounded 1 (1) 1
         if (dist_before == 0 && dist_after == 0)
             selfdist.at(index) = 1;
-        
+
         // Case 2:
             // One M away, one N away
             // redo by iterating from indicies of each side
@@ -158,7 +158,7 @@ struct Classroom {
                 coalition_IDs.insert(std::get<0>(coalition));
                 // std:: cout << "next coalition" << std::endl;
                 for(int i = 0; i < numStudents; i++){
-            
+
                     studentExpectedPayoffs[i] += std::get<2>(coalition)[i] * (double(std::get<0>(coalition).size()) / double(numStudents));
                 }
             }
@@ -181,7 +181,21 @@ struct Classroom {
             for (const auto& pair : studentExpectedPayoffs) {
                 std::cout << "ID: " << pair.first << ", Payoff: " << pair.second << "\n";
             }
+
         }
+
+        void printAdjacencies() {
+            std::cout << std::endl <<  "Printing adjacent partitions" << std::endl;
+            int i = 0;
+            for (auto it = adjacencies.begin();  it != adjacencies.end(); it++ ) {
+                std::cout << std::endl << "adjancency " << i << std::endl;
+                it->second->printParition();
+                std::cout << std::endl << "end adjancency " << i << std::endl << std::endl;
+            }
+            if (adjacencies.empty())
+                std::cout << "Could not print adjacents." << std::endl << std::endl;
+        }
+
         std::set<Coalition> coalitions;
         std::set<std::set<int>> coalition_IDs;
         int numStudents;
@@ -190,15 +204,15 @@ struct Classroom {
         std::map<std::set<int>, Partition*> adjacencies;
 
 
-            
-        
+
+
 
     };
 
 
     struct Round{
         // a Round stores the current state of the game, including all possible coalitions and partitions
-        
+
         std::map<std::set<int>, Coalition> coalitionMap;
         // This  is all of the coalitions precalculated to make the parititions quicker
         std::vector<Partition*> Partitions;
