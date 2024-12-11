@@ -1235,7 +1235,7 @@ void Classroom::thinAdjacencies(Partition* p){
             p->strong_adjacents.insert(q);
         }
         if (weak & !indifferent){
-            p->weak_adjacents.insert(p);
+            p->weak_adjacents.insert(q);
         }
     }
 }
@@ -1275,6 +1275,29 @@ void Classroom::printBasicPartitions(){
     }
 }
 
+void Classroom::printStrongAdjacency(){
+    printBasicPartitions();
+    cout << "Strong Adjacency List" << endl;
+    for (int i = 0; i < round.Partitions.size(); i++){
+        cout << "Partition " << round.Partitions[i]->pID << " has a directed edge to: ";
+        for (Partition* p : round.Partitions[i]->strong_adjacents){
+            cout << p->pID << " ";
+        }
+        cout << endl;
+    }
+}
+
+void Classroom::printWeakAdjacency(){
+    printBasicPartitions();
+    cout << "Weak Adjacency List" << endl;
+    for (int i = 0; i < round.Partitions.size(); i++){
+        cout << "Partition " << round.Partitions[i]->pID << " has a directed edge to: ";
+        for (Partition* p : round.Partitions[i]->weak_adjacents){
+            cout << p->pID << " ";
+        }
+        cout << endl;
+    }
+}
 
 
 
@@ -1458,7 +1481,7 @@ int main(){
             Classroom room(input_seats, input_rows, input_students, input_maxutil, true);
             cout << "Created Classroom. Seating all students" << endl;
             room.sitAllStudents(true);
-            room.iteratedBestResponse();
+            // room.iteratedBestResponse();
             map<int, pair<int, int>> PPexample;
             // PPexample[0] = make_pair(0, 0);
             // PPexample[1] = make_pair(0, 1);
@@ -1511,8 +1534,11 @@ int main(){
 
 
             room.thinAllAdjacencies();
-            room.printBasicPartitions();
+            // room.printBasicPartitions();
+            room.printStrongAdjacency();
+            room.printWeakAdjacency();
             cout << "finished excecution" << endl;
+            room.printClassroom();
 
             // Input set
             // Input set
